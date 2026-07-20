@@ -1,4 +1,4 @@
-package ru.nedumayy.shippingcalculator.ui.theme
+package ru.nedumayy.shippingcalculator.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
