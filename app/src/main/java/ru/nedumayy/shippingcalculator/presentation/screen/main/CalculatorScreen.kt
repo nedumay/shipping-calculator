@@ -25,25 +25,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorAmberDeep
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorBg
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorInk
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorSurface
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorTeal
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorRust
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorSteel
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorMauve
+import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorTextMute
 import java.time.LocalDate
-
-// ---------- ЦВЕТА ----------
-private val ColorInk = Color(0xFF1B1F24)
-private val ColorAmber = Color(0xFFE7A93E)
-private val ColorAmberDeep = Color(0xFFC88A22)
-private val ColorTeal = Color(0xFF2F7D6B)
-private val ColorRust = Color(0xFFB84C34)
-private val ColorSteel = Color(0xFF4C6B8A)
-private val ColorMauve = Color(0xFF8A5A7A)
-private val ColorTextMute = Color(0xFF6B7178)
-private val ColorSurface = Color(0xFFFFFFFF)
-private val ColorBg = Color(0xFFEEF1EC)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +58,6 @@ fun CalculatorScreen(
             effect.showMessage?.let { msg ->
                 snackbarHostState.showSnackbar(msg)
             }
-            //if (effect.navigateToToHistory) onNavigateToHistory()
         }
     }
 
@@ -118,16 +115,17 @@ fun CalculatorScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
                         ) {
-                            Icon(
-                                when (cat.id) {
-                                    "foot" -> Icons.Filled.Build
-                                    "moto" -> Icons.Filled.Build
-                                    "car" -> Icons.Filled.Build
-                                    else -> Icons.Filled.Build
-                                },
-                                contentDescription = cat.label,
-                                tint = if (active) ColorAmberDeep else ColorTextMute
-                            )
+//                            Icon(
+//                                painter = painterResource(id = when (cat.id) {
+//                                    "moped" -> R.drawable.moped // или другая подходящая
+//                                    "car" -> R.drawable.moped
+//                                    "truck" -> R.drawable.shuttle
+//                                    else -> R.drawable.shuttle
+//                                }),
+//                                contentDescription = cat.label,
+//                                tint = if (active) ColorAmberDeep else ColorTextMute,
+//                                modifier = Modifier.size(24.dp)
+//                            )
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 cat.label,
@@ -177,9 +175,6 @@ fun CalculatorScreen(
                 onValueChange = {},
                 label = { Text("Дата доставки", fontSize = 12.sp) },
                 readOnly = true,
-                trailingIcon = {
-                    Icon(Icons.Filled.Build, contentDescription = null, tint = ColorAmberDeep)
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp)
@@ -231,7 +226,11 @@ fun CalculatorScreen(
                     enabled = state.selectedCategory?.hasFuel == true,
                     modifier = Modifier.weight(1f)
                 )
-                NumberField("Цена, ₽/л", state.fuelPrice) {
+                NumberField(
+                    "Цена, ₽/л",
+                    state.fuelPrice,
+                    modifier = Modifier.weight(1f)
+                ) {
                     viewModel.onEvent(CalculatorEvent.FuelPriceChanged(it))
                 }
             }
@@ -259,7 +258,11 @@ fun CalculatorScreen(
                     state.selectedCategory?.annualTax?.toString() ?: "0",
                     modifier = Modifier.weight(1f)
                 )
-                NumberField("Пробег/год, км", state.annualMileage) {
+                NumberField(
+                    "Пробег/год, км",
+                    state.annualMileage,
+                    modifier = Modifier.weight(1f)
+                ) {
                     viewModel.onEvent(CalculatorEvent.AnnualMileageChanged(it))
                 }
             }
@@ -280,10 +283,18 @@ fun CalculatorScreen(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                NumberField("Доп. расходы, ₽", state.extraExpenses) {
+                NumberField(
+                    "Доп. расходы, ₽",
+                    state.extraExpenses,
+                    modifier = Modifier.weight(1f)
+                ) {
                     viewModel.onEvent(CalculatorEvent.ExtraExpensesChanged(it))
                 }
-                NumberField("Наценка, %", state.marginPercent) {
+                NumberField(
+                    "Наценка, %",
+                    state.marginPercent,
+                    modifier = Modifier.weight(1f)
+                ) {
                     viewModel.onEvent(CalculatorEvent.MarginChanged(it))
                 }
             }

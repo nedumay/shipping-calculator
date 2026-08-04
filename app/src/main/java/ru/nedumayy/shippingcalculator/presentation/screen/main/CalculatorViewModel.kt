@@ -51,15 +51,15 @@ class CalculatorViewModel @Inject constructor(
 
     private fun loadCategories() {
         val categories = listOf(
-            VehicleCategory("foot", "Пешком/вело", 0.0, 15_000.0, 20_000.0, 0.0, 5_000.0, 0.0, 0.0, false),
-            VehicleCategory("moto", "Мотоцикл", 3.5, 180_000.0, 80_000.0, 1_200.0, 15_000.0, 1.0, 3_000.0, true),
-            VehicleCategory("car", "Легковой авто", 9.0, 1_200_000.0, 300_000.0, 6_000.0, 30_000.0, 2.5, 25_000.0, true),
-            VehicleCategory("van", "Фургон", 14.0, 2_200_000.0, 400_000.0, 9_000.0, 40_000.0, 4.0, 40_000.0, true)
+            VehicleCategory("moped", "Мопед", 3.0, 120_000.0, 50_000.0, 500.0, 12_000.0, 1.5, 3_000.0, true),
+            VehicleCategory("car", "Легковой авто", 8.5, 1_800_000.0, 250_000.0, 4_500.0, 25_000.0, 3.5, 15_000.0, true),
+            VehicleCategory("van", "Фургон", 13.0, 3_500_000.0, 400_000.0, 12_000.0, 45_000.0, 6.0, 40_000.0, true),
+            VehicleCategory("truck", "Грузовик", 28.0, 10_000_000.0, 800_000.0, 45_000.0, 90_000.0, 15.0, 80_000.0, true)
         )
         _state.update {
             it.copy(
                 categories = categories,
-                selectedCategory = categories[2],
+                selectedCategory = categories[1],
                 deliveryDate = LocalDate.now().toString()
             )
         }
@@ -132,7 +132,7 @@ class CalculatorViewModel @Inject constructor(
             fuelPrice = currentState.fuelPrice.toDoubleOrNull() ?: 0.0,
             extraExpenses = currentState.extraExpenses.toDoubleOrNull() ?: 0.0,
             marginPercent = currentState.marginPercent.toDoubleOrNull() ?: 0.0,
-            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: 30000.0
+            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: category.annualMileage
         )
 
         _state.update { it.copy(costBreakdown = breakdown) }
