@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,13 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
+import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorAmberDeep
 import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorBg
 import ru.nedumayy.shippingcalculator.presentation.ui.theme.ColorInk
@@ -73,23 +74,22 @@ fun CalculatorScreen(
                 .padding(16.dp)
         ) {
             Text(
-                "РАСЧЁТ СЕБЕСТОИМОСТИ",
+                stringResource(R.string.cost_calculation),
                 color = ColorAmberDeep,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 1.5.sp
             )
             Text(
-                "Калькулятор доставки",
+                stringResource(R.string.app_name),
                 color = ColorInk,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
 
-            // Категория
             Text(
-                "Категория транспорта",
+                stringResource(R.string.transport_category),
                 color = ColorTextMute,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -122,13 +122,13 @@ fun CalculatorScreen(
 //                                    "truck" -> R.drawable.shuttle
 //                                    else -> R.drawable.shuttle
 //                                }),
-//                                contentDescription = cat.label,
+//                                contentDescription = cat.label.asString(),
 //                                tint = if (active) ColorAmberDeep else ColorTextMute,
 //                                modifier = Modifier.size(24.dp)
 //                            )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                cat.label,
+                                cat.label.asString(),
                                 fontSize = 11.sp,
                                 color = if (active) ColorInk else ColorTextMute
                             )
@@ -137,13 +137,12 @@ fun CalculatorScreen(
                 }
             }
 
-            // Маршрут
-            SectionLabel("Маршрут")
+            SectionLabel(stringResource(R.string.route))
             OutlinedTextField(
                 value = state.routeFrom,
                 onValueChange = { viewModel.onEvent(CalculatorEvent.RouteFromChanged(it)) },
-                label = { Text("Откуда", fontSize = 12.sp) },
-                placeholder = { Text("Например: Москва") },
+                label = { Text(stringResource(R.string.where_from), fontSize = 12.sp) },
+                //placeholder = { Text("Например: Москва") },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -156,8 +155,8 @@ fun CalculatorScreen(
             OutlinedTextField(
                 value = state.routeTo,
                 onValueChange = { viewModel.onEvent(CalculatorEvent.RouteToChanged(it)) },
-                label = { Text("Куда *", fontSize = 12.sp) },
-                placeholder = { Text("Например: Санкт-Петербург") },
+                label = { Text(stringResource(R.string.where_to), fontSize = 12.sp) },
+                //placeholder = { Text("Например: Санкт-Петербург") },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -173,7 +172,7 @@ fun CalculatorScreen(
             OutlinedTextField(
                 value = state.deliveryDate,
                 onValueChange = {},
-                label = { Text("Дата доставки", fontSize = 12.sp) },
+                label = { Text(stringResource(R.string.delivery_date), fontSize = 12.sp) },
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -205,61 +204,68 @@ fun CalculatorScreen(
                         }) { Text("OK") }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showDatePicker = false }) { Text("Отмена") }
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
                     }
                 ) {
                     DatePicker(state = datePickerState)
                 }
             }
 
-            // Расстояние
-            NumberField("Расстояние, км", state.distance) {
+            NumberField(stringResource(R.string.distance), state.distance) {
                 viewModel.onEvent(CalculatorEvent.DistanceChanged(it))
             }
 
-            // Топливо
-            SectionLabel("Топливо")
+            SectionLabel(stringResource(R.string.fuel))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NumberField(
-                    "Расход, л/100км",
-                    state.selectedCategory?.fuelConsumption?.toString() ?: "0",
+                    stringResource(R.string.fuel_consumption),
+                    state.fuelConsumption,
                     enabled = state.selectedCategory?.hasFuel == true,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    viewModel.onEvent(CalculatorEvent.FuelConsumptionChanged(it))
+                }
                 NumberField(
-                    "Цена, ₽/л",
+                    stringResource(R.string.price_per_liter),
                     state.fuelPrice,
                     modifier = Modifier.weight(1f)
                 ) {
                     viewModel.onEvent(CalculatorEvent.FuelPriceChanged(it))
                 }
             }
-
-            // Амортизация
-            SectionLabel("Амортизация")
+            
+            SectionLabel(stringResource(R.string.depreciation))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NumberField(
-                    "Стоимость ТС, ₽",
-                    state.selectedCategory?.vehiclePrice?.toString() ?: "0",
+                    stringResource(R.string.vehicle_price),
+                    state.vehiclePrice,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    viewModel.onEvent(CalculatorEvent.VehiclePriceChanged(it))
+                }
                 NumberField(
-                    "Ресурс, км",
-                    state.selectedCategory?.resourceMileage?.toString() ?: "0",
+                    stringResource(R.string.resource_mileage),
+                    state.resourceMileage,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    viewModel.onEvent(CalculatorEvent.ResourceMileageChanged(it))
+                }
             }
 
             // Налог
-            SectionLabel("Налог и прочее")
+            SectionLabel(stringResource(R.string.taxes_and_other))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NumberField(
-                    "Налог/год, ₽",
-                    state.selectedCategory?.annualTax?.toString() ?: "0",
+                    stringResource(R.string.annual_tax),
+                    state.annualTax,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    viewModel.onEvent(CalculatorEvent.AnnualTaxChanged(it))
+                }
                 NumberField(
-                    "Пробег/год, км",
+                    stringResource(R.string.annual_mileage),
                     state.annualMileage,
                     modifier = Modifier.weight(1f)
                 ) {
@@ -268,30 +274,34 @@ fun CalculatorScreen(
             }
 
             // ТО и страховка
-            SectionLabel("ТО и страховка")
+            SectionLabel(stringResource(R.string.maintenance_and_insurance))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NumberField(
-                    "ТО, ₽/км",
-                    state.selectedCategory?.maintenancePerKm?.toString() ?: "0",
+                    stringResource(R.string.maintenance_per_km),
+                    state.maintenancePerKm,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    viewModel.onEvent(CalculatorEvent.MaintenancePerKmChanged(it))
+                }
                 NumberField(
-                    "Страховка/год, ₽",
-                    state.selectedCategory?.annualInsurance?.toString() ?: "0",
+                    stringResource(R.string.annual_insurance),
+                    state.annualInsurance,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    viewModel.onEvent(CalculatorEvent.AnnualInsuranceChanged(it))
+                }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NumberField(
-                    "Доп. расходы, ₽",
+                    stringResource(R.string.extra_expenses),
                     state.extraExpenses,
                     modifier = Modifier.weight(1f)
                 ) {
                     viewModel.onEvent(CalculatorEvent.ExtraExpensesChanged(it))
                 }
                 NumberField(
-                    "Наценка, %",
+                    stringResource(R.string.margin),
                     state.marginPercent,
                     modifier = Modifier.weight(1f)
                 ) {
@@ -300,8 +310,7 @@ fun CalculatorScreen(
             }
 
             Spacer(Modifier.height(24.dp))
-
-            // Кнопка сохранения
+            
             Button(
                 onClick = { viewModel.onEvent(CalculatorEvent.SaveToHistory) },
                 enabled = state.canSave && !state.isSaving,
@@ -323,7 +332,7 @@ fun CalculatorScreen(
                     Spacer(Modifier.width(8.dp))
                 }
                 Text(
-                    if (state.isSaving) "Сохранение..." else "Сохранить расчёт",
+                    if (state.isSaving) stringResource(R.string.saving) else stringResource(R.string.save_calculation),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
@@ -331,8 +340,7 @@ fun CalculatorScreen(
             }
 
             Spacer(Modifier.height(24.dp))
-
-            // Чек
+            
             state.costBreakdown?.let { breakdown ->
                 Card(
                     colors = CardDefaults.cardColors(containerColor = ColorSurface),
@@ -340,13 +348,13 @@ fun CalculatorScreen(
                 ) {
                     Column(Modifier.padding(20.dp)) {
                         Text(
-                            "Чек доставки",
+                            stringResource(R.string.delivery_receipt),
                             fontSize = 11.sp,
                             color = ColorTextMute,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                         Text(
-                            "${state.selectedCategory?.label} · ${state.distance.ifBlank { "0" }} км",
+                            "${state.selectedCategory?.label?.asString()} · ${state.distance.ifBlank { "0" }} ${stringResource(R.string.km)}",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorInk,
@@ -357,13 +365,13 @@ fun CalculatorScreen(
                         HorizontalDivider(color = Color(0xFFD8D3C4))
                         Spacer(Modifier.height(10.dp))
 
-                        ReceiptRow("Топливо", breakdown.fuelTotal)
-                        ReceiptRow("Амортизация", breakdown.depreciationTotal)
-                        ReceiptRow("Налог", breakdown.taxTotal)
-                        ReceiptRow("ТО и ремонт", breakdown.maintenanceTotal)
-                        ReceiptRow("Страховка", breakdown.insuranceTotal)
-                        ReceiptRow("Доп. расходы", breakdown.extraTotal)
-                        ReceiptRow("Маржа", breakdown.marginAmount, ColorTeal)
+                        ReceiptRow(stringResource(R.string.fuel), breakdown.fuelTotal)
+                        ReceiptRow(stringResource(R.string.depreciation), breakdown.depreciationTotal)
+                        ReceiptRow(stringResource(R.string.tax), breakdown.taxTotal)
+                        ReceiptRow(stringResource(R.string.maintenance_and_repair), breakdown.maintenanceTotal)
+                        ReceiptRow(stringResource(R.string.insurance), breakdown.insuranceTotal)
+                        ReceiptRow(stringResource(R.string.extra_costs), breakdown.extraTotal)
+                        ReceiptRow(stringResource(R.string.margin_label), breakdown.marginAmount, ColorTeal)
 
                         HorizontalDivider(
                             color = Color(0xFFD8D3C4),
@@ -374,7 +382,7 @@ fun CalculatorScreen(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Цена за км", fontSize = 12.sp, color = ColorTextMute)
+                            Text(stringResource(R.string.price_per_km), fontSize = 12.sp, color = ColorTextMute)
                             Text(
                                 "${formatMoney(breakdown.finalPerKm)} ₽",
                                 fontSize = 15.sp,
@@ -389,7 +397,7 @@ fun CalculatorScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "ИТОГО",
+                                stringResource(R.string.total),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ColorInk
@@ -407,19 +415,19 @@ fun CalculatorScreen(
                 // Структура стоимости
                 Spacer(Modifier.height(20.dp))
                 Text(
-                    "Структура стоимости",
+                    stringResource(R.string.cost_structure),
                     fontSize = 11.sp,
                     color = ColorTextMute,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 val segments = listOf(
-                    "Топливо" to (breakdown.fuelTotal to ColorAmberDeep),
-                    "Амортизация" to (breakdown.depreciationTotal to ColorInk),
-                    "Налог" to (breakdown.taxTotal to ColorRust),
-                    "ТО и ремонт" to (breakdown.maintenanceTotal to ColorSteel),
-                    "Страховка" to (breakdown.insuranceTotal to ColorMauve),
-                    "Доп. расходы" to (breakdown.extraTotal to ColorTextMute),
-                    "Маржа" to (breakdown.marginAmount to ColorTeal)
+                    stringResource(R.string.fuel) to (breakdown.fuelTotal to ColorAmberDeep),
+                    stringResource(R.string.depreciation) to (breakdown.depreciationTotal to ColorInk),
+                    stringResource(R.string.tax) to (breakdown.taxTotal to ColorRust),
+                    stringResource(R.string.maintenance_and_repair) to (breakdown.maintenanceTotal to ColorSteel),
+                    stringResource(R.string.insurance) to (breakdown.insuranceTotal to ColorMauve),
+                    stringResource(R.string.extra_costs) to (breakdown.extraTotal to ColorTextMute),
+                    stringResource(R.string.margin_label) to (breakdown.marginAmount to ColorTeal)
                 ).filter { it.second.first > 0 }
                 val total = segments.sumOf { it.second.first }.let { if (it == 0.0) 1.0 else it }
 
@@ -528,9 +536,4 @@ private fun Legend(segments: List<Pair<String, Pair<Double, Color>>>, total: Dou
             }
         }
     }
-}
-
-private fun formatMoney(v: Double): String {
-    val df = java.text.DecimalFormat("#,##0.00")
-    return df.format(v)
 }

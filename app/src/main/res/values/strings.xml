@@ -1,3 +1,50 @@
 <resources>
     <string name="app_name">Shipping calculator</string>
+
+    <string name="moped">Moped</string>
+    <string name="car">Car</string>
+    <string name="van">Van</string>
+    <string name="truck">Truck</string>
+
+    <string name="error">Error</string>
+    <string name="saved">Saved</string>
+    <string name="not_specified">Not specified</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="fill_required_fields">Fill in the required fields</string>
+
+    <string name="cost_calculation">Cost calculation</string>
+    <string name="transport_category">Transport category</string>
+    <string name="route">Route</string>
+    <string name="where_from">Where from</string>
+    <string name="where_to">Where to</string>
+    <string name="delivery_date">Delivery date</string>
+    <string name="distance">Distance, km</string>
+    <string name="fuel">Fuel</string>
+    <string name="fuel_consumption">Fuel consumption, L/100 km</string>
+    <string name="price_per_liter">Price, ₽/L</string>
+
+    <string name="depreciation">Depreciation</string>
+    <string name="vehicle_price">Vehicle price, ₽</string>
+    <string name="resource_mileage">Resource, km</string>
+    <string name="taxes_and_other">Taxes and other</string>
+    <string name="annual_tax">Annual tax, ₽</string>
+    <string name="annual_mileage">Annual mileage, km</string>
+    <string name="maintenance_and_insurance">Maintenance and insurance</string>
+    <string name="maintenance_per_km">Maintenance, ₽/km</string>
+    <string name="annual_insurance">Annual insurance, ₽</string>
+    <string name="insurance">Insurance</string>
+    <string name="extra_expenses">Extra expenses, ₽</string>
+    <string name="margin">Margin, %</string>
+    <string name="saving">Saving...</string>
+    <string name="save_calculation">Save calculation</string>
+    <string name="delivery_receipt">Delivery receipt</string>
+    <string name="tax">Tax</string>
+    <string name="maintenance_and_repair">Maintenance and repair</string>
+    <string name="extra_costs">Extra costs</string>
+    <string name="margin_label">Margin</string>
+    <string name="price_per_km">Price per km</string>
+    <string name="total">TOTAL</string>
+    <string name="cost_structure">Cost structure</string>
+    <string name="km">km</string>
 </resources>

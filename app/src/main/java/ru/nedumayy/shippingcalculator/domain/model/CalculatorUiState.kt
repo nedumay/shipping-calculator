@@ -22,6 +22,14 @@ data class CalculatorUiState(
     val extraExpenses: String = "150",
     val marginPercent: String = "20",
     val annualMileage: String = "30000",
+
+    val fuelConsumption: String = "0",
+    val vehiclePrice: String = "0",
+    val resourceMileage: String = "0",
+    val annualTax: String = "0",
+    val maintenancePerKm: String = "0",
+    val annualInsurance: String = "0",
+
     val costBreakdown: CostBreakdown? = null,
     val isLoading: Boolean = false,
     val error: String? = null,

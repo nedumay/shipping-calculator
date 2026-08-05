@@ -9,9 +9,11 @@
 
 package ru.nedumayy.shippingcalculator.presentation.screen.main
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,7 +22,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
+import ru.nedumayy.shippingcalculator.common.UiText
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiEffect
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
@@ -35,7 +39,9 @@ import javax.inject.Inject
 class CalculatorViewModel @Inject constructor(
     private val calculateUseCase: CalculateDeliveryCostUseCase,
     private val saveHistoryUseCase: SaveCalculationHistoryUseCase,
-    private val repository: CalculationRepository
+    private val repository: CalculationRepository,
+    @ApplicationContext
+    private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CalculatorUiState())
@@ -51,16 +57,23 @@ class CalculatorViewModel @Inject constructor(
 
     private fun loadCategories() {
         val categories = listOf(
-            VehicleCategory("moped", "Мопед", 3.0, 120_000.0, 50_000.0, 500.0, 12_000.0, 1.5, 3_000.0, true),
-            VehicleCategory("car", "Легковой авто", 8.5, 1_800_000.0, 250_000.0, 4_500.0, 25_000.0, 3.5, 15_000.0, true),
-            VehicleCategory("van", "Фургон", 13.0, 3_500_000.0, 400_000.0, 12_000.0, 45_000.0, 6.0, 40_000.0, true),
-            VehicleCategory("truck", "Грузовик", 28.0, 10_000_000.0, 800_000.0, 45_000.0, 90_000.0, 15.0, 80_000.0, true)
+            VehicleCategory("moped", UiText.StringResource(R.string.moped), 3.0, 120_000.0, 50_000.0, 500.0, 12_000.0, 1.5, 3_000.0, true),
+            VehicleCategory("car", UiText.StringResource(R.string.car), 8.5, 1_800_000.0, 250_000.0, 4_500.0, 25_000.0, 3.5, 15_000.0, true),
+            VehicleCategory("van", UiText.StringResource(R.string.van), 13.0, 3_500_000.0, 400_000.0, 12_000.0, 45_000.0, 6.0, 40_000.0, true),
+            VehicleCategory("truck", UiText.StringResource(R.string.truck), 28.0, 10_000_000.0, 800_000.0, 45_000.0, 90_000.0, 15.0, 80_000.0, true)
         )
+        val defaultCategory = categories[1]
         _state.update {
             it.copy(
                 categories = categories,
-                selectedCategory = categories[1],
-                deliveryDate = LocalDate.now().toString()
+                selectedCategory = defaultCategory,
+                deliveryDate = LocalDate.now().toString(),
+                fuelConsumption = defaultCategory.fuelConsumption.toString(),
+                vehiclePrice = defaultCategory.vehiclePrice.toString(),
+                resourceMileage = defaultCategory.resourceMileage.toString(),
+                annualTax = defaultCategory.annualTax.toString(),
+                maintenancePerKm = defaultCategory.maintenancePerKm.toString(),
+                annualInsurance = defaultCategory.annualInsurance.toString()
             )
         }
     }
@@ -88,7 +101,17 @@ class CalculatorViewModel @Inject constructor(
     private suspend fun handleEvent(event: CalculatorEvent) {
         when (event) {
             is CalculatorEvent.CategorySelected -> {
-                _state.update { it.copy(selectedCategory = event.category) }
+                _state.update { 
+                    it.copy(
+                        selectedCategory = event.category,
+                        fuelConsumption = event.category.fuelConsumption.toString(),
+                        vehiclePrice = event.category.vehiclePrice.toString(),
+                        resourceMileage = event.category.resourceMileage.toString(),
+                        annualTax = event.category.annualTax.toString(),
+                        maintenancePerKm = event.category.maintenancePerKm.toString(),
+                        annualInsurance = event.category.annualInsurance.toString()
+                    ) 
+                }
                 calculateCost()
             }
             is CalculatorEvent.RouteFromChanged -> _state.update { it.copy(routeFrom = event.value) }
@@ -117,6 +140,30 @@ class CalculatorViewModel @Inject constructor(
                 _state.update { it.copy(annualMileage = event.value) }
                 calculateCost()
             }
+            is CalculatorEvent.FuelConsumptionChanged -> {
+                _state.update { it.copy(fuelConsumption = event.value) }
+                calculateCost()
+            }
+            is CalculatorEvent.VehiclePriceChanged -> {
+                _state.update { it.copy(vehiclePrice = event.value) }
+                calculateCost()
+            }
+            is CalculatorEvent.ResourceMileageChanged -> {
+                _state.update { it.copy(resourceMileage = event.value) }
+                calculateCost()
+            }
+            is CalculatorEvent.AnnualTaxChanged -> {
+                _state.update { it.copy(annualTax = event.value) }
+                calculateCost()
+            }
+            is CalculatorEvent.MaintenancePerKmChanged -> {
+                _state.update { it.copy(maintenancePerKm = event.value) }
+                calculateCost()
+            }
+            is CalculatorEvent.AnnualInsuranceChanged -> {
+                _state.update { it.copy(annualInsurance = event.value) }
+                calculateCost()
+            }
             is CalculatorEvent.SaveToHistory -> saveToHistory()
             is CalculatorEvent.DeleteFromHistory -> repository.deleteCalculation(event.id)
         }
@@ -126,13 +173,23 @@ class CalculatorViewModel @Inject constructor(
         val currentState = _state.value
         val category = currentState.selectedCategory ?: return
 
+        // Create a virtual category with overridden parameters
+        val virtualCategory = category.copy(
+            fuelConsumption = currentState.fuelConsumption.toDoubleOrNull() ?: 0.0,
+            vehiclePrice = currentState.vehiclePrice.toDoubleOrNull() ?: 0.0,
+            resourceMileage = currentState.resourceMileage.toDoubleOrNull() ?: 0.0,
+            annualTax = currentState.annualTax.toDoubleOrNull() ?: 0.0,
+            maintenancePerKm = currentState.maintenancePerKm.toDoubleOrNull() ?: 0.0,
+            annualInsurance = currentState.annualInsurance.toDoubleOrNull() ?: 0.0
+        )
+
         val breakdown = calculateUseCase(
-            category = category,
+            category = virtualCategory,
             distance = currentState.distance.toDoubleOrNull() ?: 0.0,
             fuelPrice = currentState.fuelPrice.toDoubleOrNull() ?: 0.0,
             extraExpenses = currentState.extraExpenses.toDoubleOrNull() ?: 0.0,
             marginPercent = currentState.marginPercent.toDoubleOrNull() ?: 0.0,
-            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: category.annualMileage
+            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: virtualCategory.annualMileage
         )
 
         _state.update { it.copy(costBreakdown = breakdown) }
@@ -144,7 +201,7 @@ class CalculatorViewModel @Inject constructor(
         val breakdown = currentState.costBreakdown ?: return
 
         if (!currentState.canSave) {
-            _effects.emit(CalculatorUiEffect(showMessage = "Заполните обязательные поля"))
+            _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.fill_required_fields)))
             return
         }
 
@@ -152,8 +209,8 @@ class CalculatorViewModel @Inject constructor(
 
         try {
             val calculation = DeliveryCalculation(
-                categoryName = category.label,
-                routeFrom = currentState.routeFrom.ifBlank { "Не указан" },
+                categoryName = category.label.asString(context),
+                routeFrom = currentState.routeFrom.ifBlank { context.getString(R.string.not_specified) },
                 routeTo = currentState.routeTo,
                 deliveryDate = currentState.deliveryDate,
                 distance = currentState.distance.toDoubleOrNull() ?: 0.0,
@@ -170,15 +227,16 @@ class CalculatorViewModel @Inject constructor(
 
             saveHistoryUseCase(calculation)
 
-            _effects.emit(
-                CalculatorUiEffect(
-                    showMessage = "Сохранено: ${currentState.routeFrom} → ${currentState.routeTo}"
+            _effects.emit(CalculatorUiEffect(
+                    showMessage = "${context.getString(R.string.saved)}: ${currentState.routeFrom} → ${currentState.routeTo}"
                 )
             )
             _state.update { it.copy(showSuccessMessage = true, isSaving = false) }
         } catch (e: Exception) {
             _state.update { it.copy(isSaving = false, error = e.message) }
-            _effects.emit(CalculatorUiEffect(showMessage = "Ошибка: ${e.message}"))
+            _effects.emit(CalculatorUiEffect(
+                showMessage = "${context.getString(R.string.error)}: ${e.message}")
+            )
         }
     }
 }

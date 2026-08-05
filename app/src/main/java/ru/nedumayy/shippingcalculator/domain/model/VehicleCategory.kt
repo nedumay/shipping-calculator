@@ -9,9 +9,11 @@
 
 package ru.nedumayy.shippingcalculator.domain.model
 
+import ru.nedumayy.shippingcalculator.common.UiText
+
 data class VehicleCategory(
     val id: String,
-    val label: String,
+    val label: UiText,
     val fuelConsumption: Double,
     val vehiclePrice: Double,
     val resourceMileage: Double,

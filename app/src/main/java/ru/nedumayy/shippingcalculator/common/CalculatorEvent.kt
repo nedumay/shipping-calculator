@@ -1,7 +1,3 @@
-package ru.nedumayy.shippingcalculator.common
-
-import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
-
 /**
  * Copyright © 2026 Nedumay.
  * All rights reserved.
@@ -10,6 +6,10 @@ import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
  * LICENSE file in the root directory of this source tree.
  * @author https://github.com/nedumay
  */
+
+package ru.nedumayy.shippingcalculator.common
+
+import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
 sealed class CalculatorEvent {
     data class CategorySelected(val category: VehicleCategory) : CalculatorEvent()
     data class RouteFromChanged(val value: String) : CalculatorEvent()
@@ -20,6 +20,14 @@ sealed class CalculatorEvent {
     data class ExtraExpensesChanged(val value: String) : CalculatorEvent()
     data class MarginChanged(val value: String) : CalculatorEvent()
     data class AnnualMileageChanged(val value: String) : CalculatorEvent()
+
+    data class FuelConsumptionChanged(val value: String) : CalculatorEvent()
+    data class VehiclePriceChanged(val value: String) : CalculatorEvent()
+    data class ResourceMileageChanged(val value: String) : CalculatorEvent()
+    data class AnnualTaxChanged(val value: String) : CalculatorEvent()
+    data class MaintenancePerKmChanged(val value: String) : CalculatorEvent()
+    data class AnnualInsuranceChanged(val value: String) : CalculatorEvent()
+
     data object SaveToHistory : CalculatorEvent()
     data class DeleteFromHistory(val id: Long) : CalculatorEvent()
 }

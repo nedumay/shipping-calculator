@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Калькулятор доставки</string>
+
+    <string name="moped">Мопед</string>
+    <string name="car">Легковой автомобиль</string>
+    <string name="van">Фургон</string>
+    <string name="truck">Грузовик</string>
+
+    <string name="error">Ошибка</string>
+    <string name="saved">Сохранено</string>
+    <string name="not_specified">Не указан</string>
+    <string name="cancel">Отмена</string>
+
+    <string name="fill_required_fields">Заполните обязательные поля</string>
+
+    <string name="cost_calculation">Расчет себестоимости</string>
+    <string name="transport_category">Категория транспорта</string>
+    <string name="route">Маршрут</string>
+    <string name="where_from">Откуда</string>
+    <string name="where_to">Куда</string>
+    <string name="delivery_date">Дата доставки</string>
+    <string name="distance">Расстояние, км</string>
+    <string name="fuel">Топливо</string>
+    <string name="fuel_consumption">Расход, л/100км</string>
+    <string name="price_per_liter">Цена, ₽/л</string>
+
+    <string name="depreciation">Амортизация</string>
+    <string name="vehicle_price">Стоимость ТС, ₽</string>
+    <string name="resource_mileage">Ресурс, км</string>
+    <string name="taxes_and_other">Налог и прочее</string>
+    <string name="annual_tax">Налог/год, ₽</string>
+    <string name="annual_mileage">Пробег/год, км</string>
+    <string name="maintenance_and_insurance">ТО и страховка</string>
+    <string name="maintenance_per_km">ТО, ₽/км</string>
+    <string name="annual_insurance">Страховка/год, ₽</string>
+    <string name="insurance">Страховка</string>
+    <string name="extra_expenses">Доп. расходы, ₽</string>
+    <string name="margin">Наценка, %</string>
+    <string name="saving">Сохранение...</string>
+    <string name="save_calculation">Сохранить расчёт</string>
+    <string name="delivery_receipt">Чек доставки</string>
+    <string name="tax">Налог</string>
+    <string name="maintenance_and_repair">ТО и ремонт</string>
+    <string name="extra_costs">Доп. расходы</string>
+    <string name="margin_label">Маржа</string>
+    <string name="price_per_km">Цена за км</string>
+    <string name="total">ИТОГО</string>
+    <string name="cost_structure">Структура стоимости</string>
+    <string name="km">км</string>
+</resources>
