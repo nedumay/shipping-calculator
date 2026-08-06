@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.UiText
+import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiEffect
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
@@ -67,7 +68,7 @@ class CalculatorViewModel @Inject constructor(
             it.copy(
                 categories = categories,
                 selectedCategory = defaultCategory,
-                deliveryDate = LocalDate.now().toString(),
+                deliveryDate = formatDate(LocalDate.now()),
                 fuelConsumption = defaultCategory.fuelConsumption.toString(),
                 vehiclePrice = defaultCategory.vehiclePrice.toString(),
                 resourceMileage = defaultCategory.resourceMileage.toString(),
