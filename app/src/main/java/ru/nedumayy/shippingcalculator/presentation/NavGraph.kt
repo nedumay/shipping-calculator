@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import ru.nedumayy.shippingcalculator.presentation.screen.Screen
+import ru.nedumayy.shippingcalculator.presentation.screen.history.HistoryScreen
 import ru.nedumayy.shippingcalculator.presentation.screen.main.CalculatorScreen
 
 @Composable
@@ -24,6 +25,10 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateToHistory = { navController.navigate(Screen.History.route) }
             )
         }
-        // composable(Screen.History.route) { HistoryScreen() } // добавим позже
+        composable(Screen.History.route) {
+            HistoryScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
     }
 }
