@@ -12,6 +12,8 @@
     <string name="not_specified">Не указан</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="back">Назад</string>
 
     <string name="fill_required_fields">Заполните обязательные поля</string>
 
@@ -54,4 +56,13 @@
     <string name="total">ИТОГО</string>
     <string name="cost_structure">Структура стоимости</string>
     <string name="km">км</string>
+
+    <!-- History Strings -->
+    <string name="calculation_history">История расчетов</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="clear_history_question">Очистить историю?</string>
+    <string name="clear_history_confirmation">Вы уверены, что хотите удалить все сохраненные расчеты?</string>
+    <string name="clear">Очистить</string>
+    <string name="history_empty">История пуста</string>
+    <string name="total_cost">Общая стоимость</string>
 </resources>

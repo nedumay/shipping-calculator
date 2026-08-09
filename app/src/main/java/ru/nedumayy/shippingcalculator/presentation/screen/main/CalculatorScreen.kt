@@ -491,11 +491,11 @@ private fun ResultCard(
             ) {
                 Column {
                     Text(stringResource(R.string.price_per_km), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(formatMoney(breakdown.finalPerKm) + " / км", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text(formatMoney(breakdown.finalPerKm) + " ₽ / " + stringResource(R.string.km), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(stringResource(R.string.total), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(formatMoney(breakdown.finalTotal), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+                    Text("${formatMoney(breakdown.finalTotal)} ₽", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -511,7 +511,7 @@ private fun ResultRow(label: String, value: Double) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(formatMoney(value), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        Text("${formatMoney(value)} ₽", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -544,7 +544,7 @@ fun SaveVehicleDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = { onDismiss() }) {
                 Text(stringResource(R.string.cancel))
             }
         }
