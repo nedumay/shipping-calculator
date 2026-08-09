@@ -7,7 +7,7 @@
  * @author https://github.com/nedumay
  */
 
-package ru.nedumayy.shippingcalculator.presentation
+package ru.nedumayy.shippingcalculator.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

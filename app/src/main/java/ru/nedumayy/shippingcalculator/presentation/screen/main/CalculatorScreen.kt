@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -133,12 +134,12 @@ fun CalculatorScreen(
                 Row(
                     modifier = Modifier
                         .horizontalScroll(rememberScrollState())
-                        .padding(bottom = 16.dp, start = 16.dp, end = 24.dp), // Added more end padding for the badge
+                        .padding(bottom = 16.dp, start = 16.dp, end = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     state.userVehicles.forEach { vehicle ->
                         val active = vehicle.id == state.selectedUserVehicle?.id
-                        Box(modifier = Modifier.padding(top = 4.dp, end = 4.dp)) { // Padding for the badge
+                        Box(modifier = Modifier.padding(top = 4.dp, end = 4.dp)) {
                             CategoryCard(
                                 label = vehicle.name,
                                 active = active,
@@ -182,6 +183,8 @@ fun CalculatorScreen(
                     value = state.routeFrom,
                     onValueChange = { viewModel.onEvent(CalculatorEvent.RouteFromChanged(it)) },
                     label = { Text(stringResource(R.string.where_from)) },
+                    placeholder = { Text("Город А", fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
@@ -190,6 +193,8 @@ fun CalculatorScreen(
                     value = state.routeTo,
                     onValueChange = { viewModel.onEvent(CalculatorEvent.RouteToChanged(it)) },
                     label = { Text(stringResource(R.string.where_to)) },
+                    placeholder = { Text("Город Б", fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
@@ -227,6 +232,7 @@ fun CalculatorScreen(
                 NumberField(
                     label = stringResource(R.string.distance),
                     value = state.distance,
+                    placeholder = "15",
                     suffix = stringResource(R.string.km)
                 ) { viewModel.onEvent(CalculatorEvent.DistanceChanged(it)) }
             }
@@ -237,12 +243,14 @@ fun CalculatorScreen(
                         NumberField(
                             label = stringResource(R.string.fuel_consumption),
                             value = state.fuelConsumption,
+                            placeholder = state.selectedCategory?.fuelConsumption?.toString() ?: "0",
                             suffix = "л/100",
                             modifier = Modifier.weight(1f)
                         ) { viewModel.onEvent(CalculatorEvent.FuelConsumptionChanged(it)) }
                         NumberField(
                             label = stringResource(R.string.price_per_liter),
                             value = state.fuelPrice,
+                            placeholder = "58",
                             suffix = "₽",
                             modifier = Modifier.weight(1f)
                         ) { viewModel.onEvent(CalculatorEvent.FuelPriceChanged(it)) }
@@ -255,12 +263,14 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.vehicle_price),
                         value = state.vehiclePrice,
+                        placeholder = state.selectedCategory?.vehiclePrice?.toLong()?.toString() ?: "0",
                         suffix = "₽",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.VehiclePriceChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.resource_mileage),
                         value = state.resourceMileage,
+                        placeholder = state.selectedCategory?.resourceMileage?.toLong()?.toString() ?: "0",
                         suffix = "км",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.ResourceMileageChanged(it)) }
@@ -272,12 +282,14 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.annual_tax),
                         value = state.annualTax,
+                        placeholder = state.selectedCategory?.annualTax?.toLong()?.toString() ?: "0",
                         suffix = "₽/г",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.AnnualTaxChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.annual_mileage),
                         value = state.annualMileage,
+                        placeholder = state.selectedCategory?.annualMileage?.toLong()?.toString() ?: "30000",
                         suffix = "км/г",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.AnnualMileageChanged(it)) }
@@ -286,12 +298,14 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.maintenance_per_km),
                         value = state.maintenancePerKm,
+                        placeholder = state.selectedCategory?.maintenancePerKm?.toString() ?: "0",
                         suffix = "₽/км",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.MaintenancePerKmChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.annual_insurance),
                         value = state.annualInsurance,
+                        placeholder = state.selectedCategory?.annualInsurance?.toLong()?.toString() ?: "0",
                         suffix = "₽/г",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.AnnualInsuranceChanged(it)) }
@@ -303,14 +317,17 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.extra_expenses),
                         value = state.extraExpenses,
+                        placeholder = "150",
                         suffix = "₽",
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.ExtraExpensesChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.margin),
                         value = state.marginPercent,
+                        placeholder = "20",
                         suffix = "%",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        imeAction = ImeAction.Done
                     ) { viewModel.onEvent(CalculatorEvent.MarginChanged(it)) }
                 }
             }
@@ -438,17 +455,27 @@ private fun NumberField(
     value: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    placeholder: String? = null,
     suffix: String? = null,
+    imeAction: ImeAction = ImeAction.Next,
     onChange: (String) -> Unit = {},
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = onChange,
+        onValueChange = { newValue ->
+            if (newValue.count { it == '.' || it == ',' } <= 1) {
+                onChange(newValue)
+            }
+        },
         label = { Text(label, fontSize = 11.sp) },
+        placeholder = placeholder?.let { { Text(it, fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) } },
         enabled = enabled,
         suffix = suffix?.let { { Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) } },
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal,
+            imeAction = imeAction
+        ),
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)

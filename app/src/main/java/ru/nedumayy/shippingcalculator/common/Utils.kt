@@ -30,3 +30,7 @@ fun parseDate(dateString: String): LocalDate {
         LocalDate.now()
     }
 }
+
+fun parseSafeDouble(value: String): Double {
+    return value.replace(',', '.').toDoubleOrNull() ?: 0.0
+}

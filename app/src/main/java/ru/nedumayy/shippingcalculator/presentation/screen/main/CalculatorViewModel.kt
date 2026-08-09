@@ -28,6 +28,7 @@ import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.UiText
 import ru.nedumayy.shippingcalculator.common.formatDate
+import ru.nedumayy.shippingcalculator.common.parseSafeDouble
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiEffect
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
@@ -56,7 +57,6 @@ class CalculatorViewModel @Inject constructor(
 
     init {
         loadCategories()
-        loadSavedSettings()
         observeUserVehicles()
     }
 
@@ -72,28 +72,8 @@ class CalculatorViewModel @Inject constructor(
             it.copy(
                 categories = categories,
                 selectedCategory = defaultCategory,
-                deliveryDate = formatDate(LocalDate.now()),
-                fuelConsumption = defaultCategory.fuelConsumption.toString(),
-                vehiclePrice = defaultCategory.vehiclePrice.toString(),
-                resourceMileage = defaultCategory.resourceMileage.toString(),
-                annualTax = defaultCategory.annualTax.toString(),
-                maintenancePerKm = defaultCategory.maintenancePerKm.toString(),
-                annualInsurance = defaultCategory.annualInsurance.toString()
+                deliveryDate = formatDate(LocalDate.now())
             )
-        }
-    }
-
-    private fun loadSavedSettings() {
-        viewModelScope.launch {
-            repository.getCurrentSettings()?.let { settings ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        fuelPrice = settings.fuelPrice.toString(),
-                        annualMileage = settings.annualMileage.toString(),
-                        marginPercent = settings.defaultMargin.toString()
-                    )
-                }
-            }
         }
     }
 
@@ -118,12 +98,13 @@ class CalculatorViewModel @Inject constructor(
                     it.copy(
                         selectedCategory = event.category,
                         selectedUserVehicle = null,
-                        fuelConsumption = event.category.fuelConsumption.toString(),
-                        vehiclePrice = event.category.vehiclePrice.toString(),
-                        resourceMileage = event.category.resourceMileage.toString(),
-                        annualTax = event.category.annualTax.toString(),
-                        maintenancePerKm = event.category.maintenancePerKm.toString(),
-                        annualInsurance = event.category.annualInsurance.toString()
+                        fuelConsumption = "",
+                        vehiclePrice = "",
+                        resourceMileage = "",
+                        annualTax = "",
+                        maintenancePerKm = "",
+                        annualInsurance = "",
+                        annualMileage = ""
                     ) 
                 }
                 calculateCost()
@@ -179,7 +160,13 @@ class CalculatorViewModel @Inject constructor(
                 calculateCost()
             }
             is CalculatorEvent.SaveToHistory -> saveToHistory()
-            is CalculatorEvent.DeleteFromHistory -> repository.deleteCalculation(event.id)
+            is CalculatorEvent.DeleteFromHistory -> {
+                try {
+                    repository.deleteCalculation(event.id)
+                } catch (e: Exception) {
+                    _effects.emit(CalculatorUiEffect(showMessage = "${context.getString(R.string.error)}: ${e.message}"))
+                }
+            }
             
             is CalculatorEvent.UserVehicleSelected -> {
                 event.vehicle?.let { vehicle ->
@@ -205,7 +192,13 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorEvent.HideSaveVehicleDialog -> _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
             is CalculatorEvent.NewVehicleNameChanged -> _state.update { it.copy(newVehicleName = event.name) }
             is CalculatorEvent.SaveUserVehicle -> saveUserVehicle()
-            is CalculatorEvent.DeleteUserVehicle -> repository.deleteUserVehicle(event.vehicle)
+            is CalculatorEvent.DeleteUserVehicle -> {
+                try {
+                    repository.deleteUserVehicle(event.vehicle)
+                } catch (e: Exception) {
+                    _effects.emit(CalculatorUiEffect(showMessage = "${context.getString(R.string.error)}: ${e.message}"))
+                }
+            }
         }
     }
 
@@ -213,33 +206,37 @@ class CalculatorViewModel @Inject constructor(
         val currentState = _state.value
         if (currentState.newVehicleName.isBlank()) return
 
-        val vehicle = UserVehicle(
-            name = currentState.newVehicleName,
-            fuelConsumption = currentState.fuelConsumption.toDoubleOrNull() ?: 0.0,
-            vehiclePrice = currentState.vehiclePrice.toDoubleOrNull() ?: 0.0,
-            resourceMileage = currentState.resourceMileage.toDoubleOrNull() ?: 0.0,
-            annualTax = currentState.annualTax.toDoubleOrNull() ?: 0.0,
-            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: 0.0,
-            maintenancePerKm = currentState.maintenancePerKm.toDoubleOrNull() ?: 0.0,
-            annualInsurance = currentState.annualInsurance.toDoubleOrNull() ?: 0.0,
-            hasFuel = true // Assuming for now, can be linked to selectedCategory.hasFuel
-        )
+        try {
+            val vehicle = UserVehicle(
+                name = currentState.newVehicleName,
+                fuelConsumption = parseSafeDouble(currentState.fuelConsumption),
+                vehiclePrice = parseSafeDouble(currentState.vehiclePrice),
+                resourceMileage = parseSafeDouble(currentState.resourceMileage),
+                annualTax = parseSafeDouble(currentState.annualTax),
+                annualMileage = parseSafeDouble(currentState.annualMileage),
+                maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm),
+                annualInsurance = parseSafeDouble(currentState.annualInsurance),
+                hasFuel = true 
+            )
 
-        repository.insertUserVehicle(vehicle)
-        _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
-        _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.saved)))
+            repository.insertUserVehicle(vehicle)
+            _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
+            _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.saved)))
+        } catch (e: Exception) {
+            _effects.emit(CalculatorUiEffect(showMessage = "${context.getString(R.string.error)}: ${e.message}"))
+        }
     }
 
-    private suspend fun calculateCost() {
+    private fun calculateCost() {
         val currentState = _state.value
         
-        val fuelConsumption = currentState.fuelConsumption.toDoubleOrNull() ?: 0.0
-        val vehiclePrice = currentState.vehiclePrice.toDoubleOrNull() ?: 0.0
-        val resourceMileage = currentState.resourceMileage.toDoubleOrNull() ?: 0.0
-        val annualTax = currentState.annualTax.toDoubleOrNull() ?: 0.0
-        val maintenancePerKm = currentState.maintenancePerKm.toDoubleOrNull() ?: 0.0
-        val annualInsurance = currentState.annualInsurance.toDoubleOrNull() ?: 0.0
-        val annualMileage = currentState.annualMileage.toDoubleOrNull() ?: 0.0
+        val fuelConsumption = parseSafeDouble(currentState.fuelConsumption)
+        val vehiclePrice = parseSafeDouble(currentState.vehiclePrice)
+        val resourceMileage = parseSafeDouble(currentState.resourceMileage)
+        val annualTax = parseSafeDouble(currentState.annualTax)
+        val maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm)
+        val annualInsurance = parseSafeDouble(currentState.annualInsurance)
+        val annualMileage = parseSafeDouble(currentState.annualMileage)
 
         val baseCategory = currentState.selectedCategory ?: currentState.categories.getOrNull(1) ?: return
 
@@ -255,10 +252,10 @@ class CalculatorViewModel @Inject constructor(
 
         val breakdown = calculateUseCase(
             category = virtualCategory,
-            distance = currentState.distance.toDoubleOrNull() ?: 0.0,
-            fuelPrice = currentState.fuelPrice.toDoubleOrNull() ?: 0.0,
-            extraExpenses = currentState.extraExpenses.toDoubleOrNull() ?: 0.0,
-            marginPercent = currentState.marginPercent.toDoubleOrNull() ?: 0.0,
+            distance = parseSafeDouble(currentState.distance),
+            fuelPrice = parseSafeDouble(currentState.fuelPrice),
+            extraExpenses = parseSafeDouble(currentState.extraExpenses),
+            marginPercent = parseSafeDouble(currentState.marginPercent),
             annualMileage = annualMileage
         )
 
@@ -272,7 +269,7 @@ class CalculatorViewModel @Inject constructor(
             ?: return
         val breakdown = currentState.costBreakdown ?: return
 
-        if (currentState.routeTo.isBlank() || (currentState.distance.toDoubleOrNull() ?: 0.0) <= 0.0) {
+        if (currentState.routeTo.isBlank() || parseSafeDouble(currentState.distance) <= 0.0) {
             _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.fill_required_fields)))
             return
         }
@@ -285,14 +282,14 @@ class CalculatorViewModel @Inject constructor(
                 routeFrom = currentState.routeFrom.ifBlank { context.getString(R.string.not_specified) },
                 routeTo = currentState.routeTo,
                 deliveryDate = currentState.deliveryDate,
-                distance = currentState.distance.toDoubleOrNull() ?: 0.0,
+                distance = parseSafeDouble(currentState.distance),
                 fuelCost = breakdown.fuelTotal,
                 depreciationCost = breakdown.depreciationTotal,
                 taxCost = breakdown.taxTotal,
                 maintenanceCost = breakdown.maintenanceTotal,
                 insuranceCost = breakdown.insuranceTotal,
                 extraExpenses = breakdown.extraTotal,
-                marginPercent = currentState.marginPercent.toDoubleOrNull() ?: 0.0,
+                marginPercent = parseSafeDouble(currentState.marginPercent),
                 totalCost = breakdown.finalTotal,
                 costPerKm = breakdown.finalPerKm
             )
