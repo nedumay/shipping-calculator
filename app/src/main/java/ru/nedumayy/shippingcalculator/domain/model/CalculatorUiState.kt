@@ -9,6 +9,7 @@
 
 package ru.nedumayy.shippingcalculator.domain.model
 
+import ru.nedumayy.shippingcalculator.common.parseSafeDouble
 import java.time.LocalDate
 
 data class CalculatorUiState(
@@ -20,18 +21,18 @@ data class CalculatorUiState(
     val routeFrom: String = "",
     val routeTo: String = "",
     val deliveryDate: String = LocalDate.now().toString(),
-    val distance: String = "15",
-    val fuelPrice: String = "58",
-    val extraExpenses: String = "150",
-    val marginPercent: String = "20",
-    val annualMileage: String = "30000",
+    val distance: String = "",
+    val fuelPrice: String = "",
+    val extraExpenses: String = "",
+    val marginPercent: String = "",
+    val annualMileage: String = "",
 
-    val fuelConsumption: String = "0",
-    val vehiclePrice: String = "0",
-    val resourceMileage: String = "0",
-    val annualTax: String = "0",
-    val maintenancePerKm: String = "0",
-    val annualInsurance: String = "0",
+    val fuelConsumption: String = "",
+    val vehiclePrice: String = "",
+    val resourceMileage: String = "",
+    val annualTax: String = "",
+    val maintenancePerKm: String = "",
+    val annualInsurance: String = "",
 
     val costBreakdown: CostBreakdown? = null,
     val isLoading: Boolean = false,
@@ -44,6 +45,6 @@ data class CalculatorUiState(
     val canSave: Boolean
         get() = (selectedCategory != null || selectedUserVehicle != null) &&
                 routeTo.isNotBlank() &&
-                (distance.toDoubleOrNull() ?: 0.0) > 0 &&
+                parseSafeDouble(distance) > 0 &&
                 costBreakdown != null
 }
