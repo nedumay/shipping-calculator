@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.nedumayy.shippingcalculator.R
@@ -29,6 +31,7 @@ import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiEffect
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
+import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
 import ru.nedumayy.shippingcalculator.domain.repository.CalculationRepository
 import ru.nedumayy.shippingcalculator.domain.usecase.CalculateDeliveryCostUseCase
@@ -54,6 +57,7 @@ class CalculatorViewModel @Inject constructor(
     init {
         loadCategories()
         loadSavedSettings()
+        observeUserVehicles()
     }
 
     private fun loadCategories() {
@@ -93,6 +97,14 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    private fun observeUserVehicles() {
+        repository.getAllUserVehicles()
+            .onEach { vehicles ->
+                _state.update { it.copy(userVehicles = vehicles) }
+            }
+            .launchIn(viewModelScope)
+    }
+
     fun onEvent(event: CalculatorEvent) {
         viewModelScope.launch {
             handleEvent(event)
@@ -105,6 +117,7 @@ class CalculatorViewModel @Inject constructor(
                 _state.update { 
                     it.copy(
                         selectedCategory = event.category,
+                        selectedUserVehicle = null,
                         fuelConsumption = event.category.fuelConsumption.toString(),
                         vehiclePrice = event.category.vehiclePrice.toString(),
                         resourceMileage = event.category.resourceMileage.toString(),
@@ -167,21 +180,77 @@ class CalculatorViewModel @Inject constructor(
             }
             is CalculatorEvent.SaveToHistory -> saveToHistory()
             is CalculatorEvent.DeleteFromHistory -> repository.deleteCalculation(event.id)
+            
+            is CalculatorEvent.UserVehicleSelected -> {
+                event.vehicle?.let { vehicle ->
+                    _state.update { 
+                        it.copy(
+                            selectedUserVehicle = vehicle,
+                            selectedCategory = null,
+                            fuelConsumption = vehicle.fuelConsumption.toString(),
+                            vehiclePrice = vehicle.vehiclePrice.toString(),
+                            resourceMileage = vehicle.resourceMileage.toString(),
+                            annualTax = vehicle.annualTax.toString(),
+                            maintenancePerKm = vehicle.maintenancePerKm.toString(),
+                            annualInsurance = vehicle.annualInsurance.toString(),
+                            annualMileage = vehicle.annualMileage.toString()
+                        )
+                    }
+                } ?: run {
+                    _state.update { it.copy(selectedUserVehicle = null) }
+                }
+                calculateCost()
+            }
+            is CalculatorEvent.ShowSaveVehicleDialog -> _state.update { it.copy(showSaveVehicleDialog = true) }
+            is CalculatorEvent.HideSaveVehicleDialog -> _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
+            is CalculatorEvent.NewVehicleNameChanged -> _state.update { it.copy(newVehicleName = event.name) }
+            is CalculatorEvent.SaveUserVehicle -> saveUserVehicle()
+            is CalculatorEvent.DeleteUserVehicle -> repository.deleteUserVehicle(event.vehicle)
         }
     }
 
-    private suspend fun calculateCost() {
+    private suspend fun saveUserVehicle() {
         val currentState = _state.value
-        val category = currentState.selectedCategory ?: return
+        if (currentState.newVehicleName.isBlank()) return
 
-        // Create a virtual category with overridden parameters
-        val virtualCategory = category.copy(
+        val vehicle = UserVehicle(
+            name = currentState.newVehicleName,
             fuelConsumption = currentState.fuelConsumption.toDoubleOrNull() ?: 0.0,
             vehiclePrice = currentState.vehiclePrice.toDoubleOrNull() ?: 0.0,
             resourceMileage = currentState.resourceMileage.toDoubleOrNull() ?: 0.0,
             annualTax = currentState.annualTax.toDoubleOrNull() ?: 0.0,
+            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: 0.0,
             maintenancePerKm = currentState.maintenancePerKm.toDoubleOrNull() ?: 0.0,
-            annualInsurance = currentState.annualInsurance.toDoubleOrNull() ?: 0.0
+            annualInsurance = currentState.annualInsurance.toDoubleOrNull() ?: 0.0,
+            hasFuel = true // Assuming for now, can be linked to selectedCategory.hasFuel
+        )
+
+        repository.insertUserVehicle(vehicle)
+        _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
+        _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.saved)))
+    }
+
+    private suspend fun calculateCost() {
+        val currentState = _state.value
+        
+        val fuelConsumption = currentState.fuelConsumption.toDoubleOrNull() ?: 0.0
+        val vehiclePrice = currentState.vehiclePrice.toDoubleOrNull() ?: 0.0
+        val resourceMileage = currentState.resourceMileage.toDoubleOrNull() ?: 0.0
+        val annualTax = currentState.annualTax.toDoubleOrNull() ?: 0.0
+        val maintenancePerKm = currentState.maintenancePerKm.toDoubleOrNull() ?: 0.0
+        val annualInsurance = currentState.annualInsurance.toDoubleOrNull() ?: 0.0
+        val annualMileage = currentState.annualMileage.toDoubleOrNull() ?: 0.0
+
+        val baseCategory = currentState.selectedCategory ?: currentState.categories.getOrNull(1) ?: return
+
+        val virtualCategory = baseCategory.copy(
+            fuelConsumption = fuelConsumption,
+            vehiclePrice = vehiclePrice,
+            resourceMileage = resourceMileage,
+            annualTax = annualTax,
+            maintenancePerKm = maintenancePerKm,
+            annualInsurance = annualInsurance,
+            annualMileage = annualMileage
         )
 
         val breakdown = calculateUseCase(
@@ -190,7 +259,7 @@ class CalculatorViewModel @Inject constructor(
             fuelPrice = currentState.fuelPrice.toDoubleOrNull() ?: 0.0,
             extraExpenses = currentState.extraExpenses.toDoubleOrNull() ?: 0.0,
             marginPercent = currentState.marginPercent.toDoubleOrNull() ?: 0.0,
-            annualMileage = currentState.annualMileage.toDoubleOrNull() ?: virtualCategory.annualMileage
+            annualMileage = annualMileage
         )
 
         _state.update { it.copy(costBreakdown = breakdown) }
@@ -198,10 +267,12 @@ class CalculatorViewModel @Inject constructor(
 
     private suspend fun saveToHistory() {
         val currentState = _state.value
-        val category = currentState.selectedCategory ?: return
+        val categoryName = currentState.selectedUserVehicle?.name 
+            ?: currentState.selectedCategory?.label?.asString(context) 
+            ?: return
         val breakdown = currentState.costBreakdown ?: return
 
-        if (!currentState.canSave) {
+        if (currentState.routeTo.isBlank() || (currentState.distance.toDoubleOrNull() ?: 0.0) <= 0.0) {
             _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.fill_required_fields)))
             return
         }
@@ -210,7 +281,7 @@ class CalculatorViewModel @Inject constructor(
 
         try {
             val calculation = DeliveryCalculation(
-                categoryName = category.label.asString(context),
+                categoryName = categoryName,
                 routeFrom = currentState.routeFrom.ifBlank { context.getString(R.string.not_specified) },
                 routeTo = currentState.routeTo,
                 deliveryDate = currentState.deliveryDate,

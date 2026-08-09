@@ -31,6 +31,9 @@ interface CalculationDao {
     @Delete
     suspend fun deleteCalculation(calculation: CalculationEntity)
 
+    @Query("DELETE FROM calculations WHERE id = :id")
+    suspend fun deleteCalculationById(id: Long)
+
     @Query("DELETE FROM calculations")
     suspend fun clearHistory()
 }

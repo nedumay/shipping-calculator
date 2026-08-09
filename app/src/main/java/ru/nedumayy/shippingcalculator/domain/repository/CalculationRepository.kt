@@ -12,6 +12,7 @@ package ru.nedumayy.shippingcalculator.domain.repository
 import kotlinx.coroutines.flow.Flow
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorSettings
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
+import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 
 interface CalculationRepository {
     fun getAllCalculations(): Flow<List<DeliveryCalculation>>
@@ -21,4 +22,9 @@ interface CalculationRepository {
 
     suspend fun saveCurrentSettings(settings: CalculatorSettings)
     suspend fun getCurrentSettings(): CalculatorSettings?
+
+    fun getAllUserVehicles(): Flow<List<UserVehicle>>
+    suspend fun insertUserVehicle(vehicle: UserVehicle)
+    suspend fun deleteUserVehicle(vehicle: UserVehicle)
+    suspend fun updateUserVehicle(vehicle: UserVehicle)
 }

@@ -19,6 +19,7 @@ import dagger.hilt.components.SingletonComponent
 import ru.nedumayy.shippingcalculator.data.db.AppDatabase
 import ru.nedumayy.shippingcalculator.data.db.dao.CalculationDao
 import ru.nedumayy.shippingcalculator.data.db.dao.SettingsDao
+import ru.nedumayy.shippingcalculator.data.db.dao.UserVehicleDao
 import javax.inject.Singleton
 
 @Module
@@ -40,4 +41,9 @@ object DatabaseModule {
     @Singleton
     fun provideSettingsDao(database: AppDatabase): SettingsDao =
         database.settingsDao()
+
+    @Provides
+    @Singleton
+    fun provideUserVehicleDao(database: AppDatabase): UserVehicleDao =
+        database.userVehicleDao()
 }

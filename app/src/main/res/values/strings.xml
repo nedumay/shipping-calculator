@@ -10,11 +10,17 @@
     <string name="saved">Saved</string>
     <string name="not_specified">Not specified</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
     <string name="fill_required_fields">Fill in the required fields</string>
 
     <string name="cost_calculation">Cost calculation</string>
     <string name="transport_category">Transport category</string>
+    <string name="my_vehicles">My vehicles</string>
+    <string name="save_current_vehicle">Save current vehicle</string>
+    <string name="vehicle_name">Vehicle name</string>
+    <string name="enter_vehicle_name">Enter vehicle name</string>
+
     <string name="route">Route</string>
     <string name="where_from">Where from</string>
     <string name="where_to">Where to</string>

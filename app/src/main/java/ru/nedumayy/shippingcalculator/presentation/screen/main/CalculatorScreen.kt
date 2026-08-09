@@ -20,15 +20,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,7 +42,6 @@ import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.parseDate
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
-import ru.nedumayy.shippingcalculator.presentation.ui.theme.*
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +60,15 @@ fun CalculatorScreen(
                 snackbarHostState.showSnackbar(msg)
             }
         }
+    }
+
+    if (state.showSaveVehicleDialog) {
+        SaveVehicleDialog(
+            name = state.newVehicleName,
+            onNameChange = { viewModel.onEvent(CalculatorEvent.NewVehicleNameChanged(it)) },
+            onConfirm = { viewModel.onEvent(CalculatorEvent.SaveUserVehicle) },
+            onDismiss = { viewModel.onEvent(CalculatorEvent.HideSaveVehicleDialog) }
+        )
     }
 
     Scaffold(
@@ -94,13 +102,11 @@ fun CalculatorScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
-            SectionLabel(
-                stringResource(R.string.transport_category)
-            )
+            SectionLabel(stringResource(R.string.transport_category))
             Row(
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
-                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                    .padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 state.categories.forEach { cat ->
@@ -110,6 +116,64 @@ fun CalculatorScreen(
                         active = active,
                         onClick = { viewModel.onEvent(CalculatorEvent.CategorySelected(cat)) }
                     )
+                }
+            }
+
+            if (state.userVehicles.isNotEmpty()) {
+                SectionLabel(
+                    text = stringResource(R.string.my_vehicles),
+                    action = {
+                        TextButton(onClick = { viewModel.onEvent(CalculatorEvent.ShowSaveVehicleDialog) }) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text(stringResource(R.string.save), fontSize = 12.sp)
+                        }
+                    }
+                )
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(bottom = 16.dp, start = 16.dp, end = 24.dp), // Added more end padding for the badge
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    state.userVehicles.forEach { vehicle ->
+                        val active = vehicle.id == state.selectedUserVehicle?.id
+                        Box(modifier = Modifier.padding(top = 4.dp, end = 4.dp)) { // Padding for the badge
+                            CategoryCard(
+                                label = vehicle.name,
+                                active = active,
+                                onClick = { viewModel.onEvent(CalculatorEvent.UserVehicleSelected(vehicle)) }
+                            )
+                            if (active) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = 4.dp, y = (-4).dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.error)
+                                        .clickable { viewModel.onEvent(CalculatorEvent.DeleteUserVehicle(vehicle)) },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onError,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                TextButton(
+                    onClick = { viewModel.onEvent(CalculatorEvent.ShowSaveVehicleDialog) },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.save_current_vehicle))
                 }
             }
 
@@ -167,7 +231,7 @@ fun CalculatorScreen(
                 ) { viewModel.onEvent(CalculatorEvent.DistanceChanged(it)) }
             }
 
-            AnimatedVisibility(visible = state.selectedCategory?.hasFuel == true) {
+            AnimatedVisibility(visible = state.selectedCategory?.hasFuel != false) {
                 InputGroupCard(title = stringResource(R.string.fuel)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         NumberField(
@@ -297,6 +361,25 @@ fun CalculatorScreen(
 }
 
 @Composable
+private fun SectionLabel(text: String, action: @Composable (() -> Unit)? = null) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        action?.invoke()
+    }
+}
+
+@Composable
 private fun InputGroupCard(title: String, content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier = Modifier
@@ -385,164 +468,118 @@ private fun ResultCard(
     ) {
         Column(Modifier.padding(20.dp)) {
             Text(
-                stringResource(R.string.delivery_receipt),
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                text = stringResource(R.string.delivery_receipt),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold
             )
-            Text(
-                "${state.selectedCategory?.label?.asString()} · ${state.distance} ${stringResource(R.string.km)}",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 12.dp)
-            )
-            
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(Modifier.height(10.dp))
-
-            ReceiptRow(stringResource(R.string.fuel), breakdown.fuelTotal)
-            ReceiptRow(stringResource(R.string.depreciation), breakdown.depreciationTotal)
-            ReceiptRow(stringResource(R.string.tax), breakdown.taxTotal)
-            ReceiptRow(stringResource(R.string.maintenance_and_repair), breakdown.maintenanceTotal)
-            ReceiptRow(stringResource(R.string.insurance), breakdown.insuranceTotal)
-            ReceiptRow(stringResource(R.string.extra_costs), breakdown.extraTotal)
-            ReceiptRow(stringResource(R.string.margin_label), breakdown.marginAmount, MaterialTheme.colorScheme.tertiary)
-
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(vertical = 10.dp))
-
-            CostStructureBar(breakdown)
-            
             Spacer(Modifier.height(16.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(stringResource(R.string.price_per_km), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("${formatMoney(breakdown.finalPerKm)} ₽", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-            }
-            Spacer(Modifier.height(6.dp))
+            
+            ResultRow(stringResource(R.string.fuel), breakdown.fuelTotal)
+            ResultRow(stringResource(R.string.depreciation), breakdown.depreciationTotal)
+            ResultRow(stringResource(R.string.tax), breakdown.taxTotal)
+            ResultRow(stringResource(R.string.maintenance_and_repair), breakdown.maintenanceTotal)
+            ResultRow(stringResource(R.string.insurance), breakdown.insuranceTotal)
+            ResultRow(stringResource(R.string.extra_costs), breakdown.extraTotal)
+            ResultRow("${stringResource(R.string.margin_label)} (${state.marginPercent}%)", breakdown.marginAmount)
+            
+            HorizontalDivider(Modifier.padding(vertical = 12.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+            
             Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
-                Text(stringResource(R.string.total), fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    "${formatMoney(breakdown.finalTotal)} ₽",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReceiptRow(label: String, value: Double, accentColor: Color = MaterialTheme.colorScheme.onSurface) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(label, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
-        Text("${formatMoney(value)} ₽", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = accentColor)
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun CostStructureBar(breakdown: CostBreakdown) {
-    val upkeepTotal = breakdown.taxTotal + breakdown.maintenanceTotal + breakdown.insuranceTotal
-    
-    val segments = listOf(
-        Triple(breakdown.fuelTotal, MaterialTheme.colorScheme.primary, stringResource(R.string.fuel)),
-        Triple(breakdown.depreciationTotal, MaterialTheme.colorScheme.secondary, stringResource(R.string.depreciation)),
-        Triple(upkeepTotal, MaterialTheme.colorScheme.error, stringResource(R.string.maintenance_and_insurance)),
-        Triple(breakdown.extraTotal, MaterialTheme.colorScheme.outline, stringResource(R.string.extra_costs)),
-        Triple(breakdown.marginAmount, MaterialTheme.colorScheme.tertiary, stringResource(R.string.margin_label))
-    ).filter { it.first > 0 }
-
-    val total = segments.sumOf { it.first }.coerceAtLeast(1.0)
-
-    Column {
-        Row(Modifier
-            .fillMaxWidth()
-            .height(10.dp)
-            .clip(RoundedCornerShape(5.dp))) {
-            segments.forEach { (value, color, _) ->
-                Box(Modifier
-                    .weight((value / total).toFloat().coerceAtLeast(0.01f))
-                    .fillMaxHeight()
-                    .background(color))
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            segments.forEach { (value, color, label) ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier
-                        .size(8.dp)
-                        .background(color, RoundedCornerShape(2.dp)))
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = "$label ${(value/total*100).toInt()}%",
-                        fontSize = 10.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Column {
+                    Text(stringResource(R.string.price_per_km), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(formatMoney(breakdown.finalPerKm) + " / км", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(stringResource(R.string.total), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(formatMoney(breakdown.finalTotal), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
     }
 }
 
+@Composable
+private fun ResultRow(label: String, value: Double) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(formatMoney(value), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+fun SaveVehicleDialog(
+    name: String,
+    onNameChange: (String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.save_current_vehicle)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.enter_vehicle_name))
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = onNameChange,
+                    label = { Text(stringResource(R.string.vehicle_name)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm, enabled = name.isNotBlank()) {
+                Text(stringResource(R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DatePickerDialogComponent(
+fun DatePickerDialogComponent(
     initialDate: String,
     onDateSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = try {
-            parseDate(initialDate).toEpochDay() * 86400000L
-        } catch (e: Exception) {
-            System.currentTimeMillis()
-        }
+        initialSelectedDateMillis = parseDate(initialDate)?.toEpochDay()?.let { it * 24 * 60 * 60 * 1000 }
     )
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                datePickerState.selectedDateMillis?.let { millis ->
-                    val date = LocalDate.ofEpochDay(millis / 86400000L)
-                    onDateSelected(formatDate(date))
+                datePickerState.selectedDateMillis?.let {
+                    onDateSelected(formatDate(LocalDate.ofEpochDay(it / (24 * 60 * 60 * 1000))))
                 }
                 onDismiss()
-            }) { Text("OK") }
+            }) {
+                Text("OK")
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
         }
     ) {
         DatePicker(state = datePickerState)
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text,
-        fontSize = 13.sp,
-        color = MaterialTheme.colorScheme.primary,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
-    )
 }

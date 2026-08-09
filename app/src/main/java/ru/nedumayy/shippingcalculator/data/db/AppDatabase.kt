@@ -13,15 +13,18 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import ru.nedumayy.shippingcalculator.data.db.dao.CalculationDao
 import ru.nedumayy.shippingcalculator.data.db.dao.SettingsDao
+import ru.nedumayy.shippingcalculator.data.db.dao.UserVehicleDao
 import ru.nedumayy.shippingcalculator.data.db.model.CalculationEntity
 import ru.nedumayy.shippingcalculator.data.db.model.SettingsEntity
+import ru.nedumayy.shippingcalculator.data.db.model.UserVehicleEntity
 
 @Database(
-    entities = [CalculationEntity::class, SettingsEntity::class],
-    version = 1,
+    entities = [CalculationEntity::class, SettingsEntity::class, UserVehicleEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun calculationDao(): CalculationDao
     abstract fun settingsDao(): SettingsDao
+    abstract fun userVehicleDao(): UserVehicleDao
 }

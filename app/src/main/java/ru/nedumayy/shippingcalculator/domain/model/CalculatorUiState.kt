@@ -14,6 +14,9 @@ import java.time.LocalDate
 data class CalculatorUiState(
     val categories: List<VehicleCategory> = emptyList(),
     val selectedCategory: VehicleCategory? = null,
+    val userVehicles: List<UserVehicle> = emptyList(),
+    val selectedUserVehicle: UserVehicle? = null,
+    
     val routeFrom: String = "",
     val routeTo: String = "",
     val deliveryDate: String = LocalDate.now().toString(),
@@ -34,10 +37,12 @@ data class CalculatorUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val showSuccessMessage: Boolean = false,
-    val isSaving: Boolean = false
+    val isSaving: Boolean = false,
+    val showSaveVehicleDialog: Boolean = false,
+    val newVehicleName: String = ""
 ) {
     val canSave: Boolean
-        get() = selectedCategory != null &&
+        get() = (selectedCategory != null || selectedUserVehicle != null) &&
                 routeTo.isNotBlank() &&
                 (distance.toDoubleOrNull() ?: 0.0) > 0 &&
                 costBreakdown != null

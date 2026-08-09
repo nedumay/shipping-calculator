@@ -1,9 +1,20 @@
+/**
+ * Copyright © 2026 Nedumay.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ * @author https://github.com/nedumay
+ */
+
 package ru.nedumayy.shippingcalculator.data
 
 import ru.nedumayy.shippingcalculator.data.db.model.CalculationEntity
 import ru.nedumayy.shippingcalculator.data.db.model.SettingsEntity
+import ru.nedumayy.shippingcalculator.data.db.model.UserVehicleEntity
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorSettings
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
+import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 
 fun CalculationEntity.toDomain(): DeliveryCalculation = DeliveryCalculation(
     id = id,
@@ -43,8 +54,6 @@ fun DeliveryCalculation.toEntity(): CalculationEntity = CalculationEntity(
     createdAt = createdAt
 )
 
-// --- SettingsEntity <-> CalculatorSettings ---
-
 fun SettingsEntity.toDomain(): CalculatorSettings = CalculatorSettings(
     selectedCategoryId = selectedCategoryId,
     fuelPrice = fuelPrice,
@@ -57,4 +66,30 @@ fun CalculatorSettings.toEntity(): SettingsEntity = SettingsEntity(
     fuelPrice = fuelPrice,
     annualMileage = annualMileage,
     defaultMargin = defaultMargin
+)
+
+fun UserVehicleEntity.toDomain(): UserVehicle = UserVehicle(
+    id = id,
+    name = name,
+    fuelConsumption = fuelConsumption,
+    vehiclePrice = vehiclePrice,
+    resourceMileage = resourceMileage,
+    annualTax = annualTax,
+    annualMileage = annualMileage,
+    maintenancePerKm = maintenancePerKm,
+    annualInsurance = annualInsurance,
+    hasFuel = hasFuel
+)
+
+fun UserVehicle.toEntity(): UserVehicleEntity = UserVehicleEntity(
+    id = id,
+    name = name,
+    fuelConsumption = fuelConsumption,
+    vehiclePrice = vehiclePrice,
+    resourceMileage = resourceMileage,
+    annualTax = annualTax,
+    annualMileage = annualMileage,
+    maintenancePerKm = maintenancePerKm,
+    annualInsurance = annualInsurance,
+    hasFuel = hasFuel
 )

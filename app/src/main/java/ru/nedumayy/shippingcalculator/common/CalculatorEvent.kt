@@ -9,7 +9,9 @@
 
 package ru.nedumayy.shippingcalculator.common
 
+import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
+
 sealed class CalculatorEvent {
     data class CategorySelected(val category: VehicleCategory) : CalculatorEvent()
     data class RouteFromChanged(val value: String) : CalculatorEvent()
@@ -30,4 +32,11 @@ sealed class CalculatorEvent {
 
     data object SaveToHistory : CalculatorEvent()
     data class DeleteFromHistory(val id: Long) : CalculatorEvent()
+
+    data class UserVehicleSelected(val vehicle: UserVehicle?) : CalculatorEvent()
+    data object ShowSaveVehicleDialog : CalculatorEvent()
+    data object HideSaveVehicleDialog : CalculatorEvent()
+    data class NewVehicleNameChanged(val name: String) : CalculatorEvent()
+    data object SaveUserVehicle : CalculatorEvent()
+    data class DeleteUserVehicle(val vehicle: UserVehicle) : CalculatorEvent()
 }
