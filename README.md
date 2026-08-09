@@ -26,7 +26,7 @@
 *   **Language:** Kotlin
 *   **Architecture:** Clean Architecture + MVVM
 *   **Dependency Injection:** Dagger Hilt
-*   **Database:** Room (for history and vehicle profiles)
+*   **Database:** Room
 *   **Navigation:** Jetpack Navigation Compose
 *   **Minimum Android Version:** Android 10 (API 29)
 
@@ -54,7 +54,7 @@
 *   **Язык:** Kotlin
 *   **Архитектура:** Clean Architecture + MVVM
 *   **Внедрение зависимостей:** Dagger Hilt
-*   **База данных:** Room (для хранения истории и профилей)
+*   **База данных:** Room
 *   **Навигация:** Jetpack Navigation Compose
 *   **Минимальная версия Android:** Android 10 (API 29)
 
