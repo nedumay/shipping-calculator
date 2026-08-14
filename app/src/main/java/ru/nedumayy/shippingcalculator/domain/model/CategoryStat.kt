@@ -7,10 +7,10 @@
  * @author https://github.com/nedumay
  */
 
-package ru.nedumayy.shippingcalculator.presentation.screen
+package ru.nedumayy.shippingcalculator.domain.model
 
-sealed class Screen(val route: String) {
-    object Calculator : Screen("calculator")
-    object History : Screen("history")
-    object Analytics : Screen("analytics")
-}
+data class CategoryStat(
+    val categoryName: String,
+    val profit: Double,
+    val count: Int
+)

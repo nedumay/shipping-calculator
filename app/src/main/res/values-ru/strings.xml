@@ -65,4 +65,15 @@
     <string name="clear">Очистить</string>
     <string name="history_empty">История пуста</string>
     <string name="total_cost">Общая стоимость</string>
+
+    <!-- Analytics Strings -->
+    <string name="analytics">Аналитика</string>
+    <string name="total_revenue">Выручка</string>
+    <string name="total_expenses">Расходы</string>
+    <string name="net_profit">Чистая прибыль</string>
+    <string name="avg_cost_km">Средний расход на км</string>
+    <string name="most_profitable">Самая прибыльная категория</string>
+    <string name="by_category">Прибыль по категориям</string>
+    <string name="no_data">Нет данных для анализа</string>
+    <string name="orders_count">заказов</string>
 </resources>

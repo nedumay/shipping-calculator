@@ -20,9 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,6 +51,7 @@ import java.time.LocalDate
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = hiltViewModel(),
     onNavigateToHistory: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -83,10 +85,17 @@ fun CalculatorScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToAnalytics) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = stringResource(R.string.analytics),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = onNavigateToHistory) {
                         Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "History",
+                            imageVector = Icons.AutoMirrored.Filled.List,
+                            contentDescription = stringResource(R.string.calculation_history),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -422,10 +431,10 @@ private fun InputGroupCard(title: String, content: @Composable ColumnScope.() ->
 @Composable
 private fun CategoryCard(label: String, active: Boolean, onClick: () -> Unit) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+        targetValue = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface, label = ""
     )
     val contentColor by animateColorAsState(
-        targetValue = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+        targetValue = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface, label = ""
     )
 
     Card(
