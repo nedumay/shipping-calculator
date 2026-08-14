@@ -26,10 +26,12 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -44,7 +46,9 @@ import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.parseDate
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
-import java.time.LocalDate
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,11 +60,12 @@ fun CalculatorScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             effect.showMessage?.let { msg ->
-                snackbarHostState.showSnackbar(msg)
+                snackbarHostState.showSnackbar(msg.asString(context))
             }
         }
     }
@@ -209,7 +214,7 @@ fun CalculatorScreen(
                         .padding(bottom = 8.dp)
                 )
                 
-                var showDatePicker by remember { mutableStateOf(false) }
+                var showDatePicker by rememberSaveable { mutableStateOf(false) }
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .clickable { showDatePicker = true }) {
@@ -595,7 +600,7 @@ fun DatePickerDialogComponent(
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = parseDate(initialDate)?.toEpochDay()?.let { it * 24 * 60 * 60 * 1000 }
+        initialSelectedDateMillis = parseDate(initialDate)?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
     )
 
     DatePickerDialog(
@@ -603,7 +608,8 @@ fun DatePickerDialogComponent(
         confirmButton = {
             TextButton(onClick = {
                 datePickerState.selectedDateMillis?.let {
-                    onDateSelected(formatDate(LocalDate.ofEpochDay(it / (24 * 60 * 60 * 1000))))
+                    val date = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC")).toLocalDate()
+                    onDateSelected(formatDate(date))
                 }
                 onDismiss()
             }) {
@@ -611,7 +617,7 @@ fun DatePickerDialogComponent(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = { onDismiss() }) {
                 Text(stringResource(R.string.cancel))
             }
         }

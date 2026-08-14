@@ -9,7 +9,9 @@
 
 package ru.nedumayy.shippingcalculator.domain.model
 
+import ru.nedumayy.shippingcalculator.common.UiText
+
 data class CalculatorUiEffect(
     val navigateToHistory: Boolean = false,
-    val showMessage: String? = null
+    val showMessage: UiText? = null
 )
