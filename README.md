@@ -19,6 +19,8 @@
 *   **Margin & Profit:** Set custom margins to calculate the final price for the customer.
 *   **Calculation History:** Save and view previous calculations using local storage.
 *   **Cost Structure:** Visual breakdown of the total cost components.
+*   **Business Analytics:** View total revenue, expenses, net profit, and average cost per km across all saved calculations.
+*   **Category Performance:** Analyze profitability and order counts for each vehicle category.
 
 ### Tech Stack
 
@@ -47,6 +49,8 @@
 *   **Маржа и прибыль:** Установка наценки для формирования итоговой стоимости для клиента.
 *   **История расчетов:** Локальное сохранение и просмотр предыдущих результатов.
 *   **Структура затрат:** Наглядная детализация всех компонентов итоговой стоимости.
+*   **Бизнес-аналитика:** Отслеживание общей выручки, расходов, чистой прибыли и средней стоимости километра.
+*   **Эффективность категорий:** Анализ доходности и количества заказов по каждому типу транспорта.
 
 ### Технологический стек
 
