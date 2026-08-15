@@ -1,21 +1,36 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Project specific ProGuard rules
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep Room entities and DAOs
+-keep class ru.nedumayy.shippingcalculator.data.db.model.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn androidx.room.paging.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+#Keep model domain
+-keep class ru.nedumayy.shippingcalculator.domain.model.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Hilt/Dagger rules
+-keep class com.google.dagger.** { *; }
+-keep class dagger.hilt.** { *; }
+-keep class * extends dagger.hilt.internal.GeneratedComponent
+-keep class * extends dagger.hilt.internal.GeneratedComponentManager
+-keep class * extends dagger.hilt.internal.UnsafeCasts
+-keep class * implements dagger.hilt.internal.GeneratedComponent
+-keep class * implements dagger.hilt.internal.GeneratedComponentManager
+-keep class * implements dagger.hilt.internal.UnsafeCasts
+
+# Keep Compose/Kotlin specific attributes
+-keepattributes Signature, Annotation, InnerClasses, EnclosingMethod
+-keepattributes SourceFile, LineNumberTable
+
+# Kotlin Coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepclassmembernames class kotlinx.coroutines.android.HandlerContext$ScheduledPatch {
+    volatile <fields>;
+}
+
+# Navigation Compose
+-keep class androidx.navigation.compose.** { *; }
+
+# Retain information for debugging stack traces
+-renamesourcefileattribute SourceFile
