@@ -37,16 +37,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
+import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    onNavigateBack: () -> Unit = {},
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val calculations by viewModel.calculations.collectAsState()
     var showClearDialog by rememberSaveable { mutableStateOf(false) }
-    var backPressed by rememberSaveable { mutableStateOf(false) }
 
     if (showClearDialog) {
         AlertDialog(
@@ -73,16 +72,6 @@ fun HistoryScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.calculation_history), fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        if (!backPressed) {
-                            backPressed = true
-                            onNavigateBack()
-                        }
-                    }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
                 actions = {
                     if (calculations.isNotEmpty()) {
                         IconButton(onClick = { showClearDialog = true }) {
@@ -111,7 +100,12 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp, 
+                    top = 16.dp, 
+                    end = 16.dp, 
+                    bottom = Screen.BottomPadding
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(calculations, key = { it.id }) { calculation ->

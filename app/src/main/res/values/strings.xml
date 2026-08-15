@@ -75,4 +75,10 @@
     <string name="by_category">Profit by category</string>
     <string name="no_data">No data for analytics</string>
     <string name="orders_count">orders</string>
+
+    <!-- Screen Titles -->
+    <string name="screen_calculator">Calculator</string>
+    <string name="screen_history">History</string>
+    <string name="screen_analytics">Analytics</string>
+    <string name="screen_maintenance">Maintenance</string>
 </resources>

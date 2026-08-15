@@ -12,12 +12,8 @@ package ru.nedumayy.shippingcalculator.presentation.screen.analytics
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,30 +23,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.formatMoney
+import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(
-    viewModel: AnalyticsViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    viewModel: AnalyticsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    var backPressed by rememberSaveable { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.analytics), fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        if (!backPressed) {
-                            backPressed = true
-                            onNavigateBack()
-                        }
-                    }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                }
+                title = { Text(stringResource(R.string.analytics), fontWeight = FontWeight.Bold) }
             )
         }
     ) { padding ->
@@ -65,12 +49,6 @@ fun AnalyticsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                    )
                     Spacer(Modifier.height(16.dp))
                     Text(
                         text = stringResource(R.string.no_data),
@@ -84,7 +62,12 @@ fun AnalyticsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = Screen.BottomPadding
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {

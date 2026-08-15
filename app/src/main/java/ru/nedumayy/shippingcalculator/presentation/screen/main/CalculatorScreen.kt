@@ -20,9 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,6 +44,7 @@ import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.parseDate
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
+import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -53,9 +52,7 @@ import java.time.ZoneOffset
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreen(
-    viewModel: CalculatorViewModel = hiltViewModel(),
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToAnalytics: () -> Unit = {},
+    viewModel: CalculatorViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -88,22 +85,6 @@ fun CalculatorScreen(
                         text = stringResource(R.string.app_name),
                         fontWeight = FontWeight.Bold
                     )
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToAnalytics) {
-                        Icon(
-                            imageVector = Icons.Filled.Info,
-                            contentDescription = stringResource(R.string.analytics),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(onClick = onNavigateToHistory) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.List,
-                            contentDescription = stringResource(R.string.calculation_history),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -386,7 +367,7 @@ fun CalculatorScreen(
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(Screen.BottomPadding))
         }
     }
 }
