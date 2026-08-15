@@ -9,9 +9,11 @@
 
 package ru.nedumayy.shippingcalculator.domain.model
 
-import ru.nedumayy.shippingcalculator.common.UiText
-
-data class CalculatorUiEffect(
-    val navigateToHistory: Boolean = false,
-    val showMessage: UiText? = null
+data class AnalyticsData(
+    val totalRevenue: Double = 0.0,
+    val totalExpenses: Double = 0.0,
+    val netProfit: Double = 0.0,
+    val averageCostPerKm: Double = 0.0,
+    val mostProfitableCategory: String = "-",
+    val categoryStats: List<CategoryStat> = emptyList()
 )

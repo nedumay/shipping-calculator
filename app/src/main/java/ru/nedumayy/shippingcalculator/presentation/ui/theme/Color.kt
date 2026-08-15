@@ -3,9 +3,9 @@ package ru.nedumayy.shippingcalculator.presentation.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // --- Light Theme (Industrial Yellow & Black) ---
-val PrimaryLight = Color(0xFFFFB300) // Яркий желтый (Amber 600)
+val PrimaryLight = Color(0xFFFFB300)
 val OnPrimaryLight = Color(0xFF000000)
-val PrimaryContainerLight = Color(0xFFFFD54F) // Теплый желтый (Amber 300)
+val PrimaryContainerLight = Color(0xFFFFD54F)
 val OnPrimaryContainerLight = Color(0xFF000000)
 
 val SecondaryLight = Color(0xFF000000)
@@ -21,11 +21,11 @@ val OnTertiaryContainerLight = Color(0xFF261900)
 val ErrorLight = Color(0xFFD32F2F)
 val OnErrorLight = Color(0xFFFFFFFF)
 
-val BackgroundLight = Color(0xFFF2F2F7) // Светло-серый "Apple-style" фон для контраста
+val BackgroundLight = Color(0xFFF2F2F7)
 val OnBackgroundLight = Color(0xFF000000)
-val SurfaceLight = Color(0xFFFFFFFF)    // Чисто белые карточки
+val SurfaceLight = Color(0xFFFFFFFF)
 val OnSurfaceLight = Color(0xFF000000)
-val SurfaceVariantLight = Color(0xFFE5E5EA) // Для неактивных элементов
+val SurfaceVariantLight = Color(0xFFE5E5EA)
 val OnSurfaceVariantLight = Color(0xFF3A3A3C)
 val OutlineLight = Color(0xFFC7C7CC)
 val OutlineVariantLight = Color(0xFFD1D1D6)

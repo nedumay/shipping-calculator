@@ -164,7 +164,7 @@ class CalculatorViewModel @Inject constructor(
                 try {
                     repository.deleteCalculation(event.id)
                 } catch (e: Exception) {
-                    _effects.emit(CalculatorUiEffect(showMessage = "${context.getString(R.string.error)}: ${e.message}"))
+                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
                 }
             }
             
@@ -196,7 +196,7 @@ class CalculatorViewModel @Inject constructor(
                 try {
                     repository.deleteUserVehicle(event.vehicle)
                 } catch (e: Exception) {
-                    _effects.emit(CalculatorUiEffect(showMessage = "${context.getString(R.string.error)}: ${e.message}"))
+                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
                 }
             }
         }
@@ -221,9 +221,9 @@ class CalculatorViewModel @Inject constructor(
 
             repository.insertUserVehicle(vehicle)
             _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
-            _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.saved)))
+            _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.saved)))
         } catch (e: Exception) {
-            _effects.emit(CalculatorUiEffect(showMessage = "${context.getString(R.string.error)}: ${e.message}"))
+            _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
         }
     }
 
@@ -270,7 +270,7 @@ class CalculatorViewModel @Inject constructor(
         val breakdown = currentState.costBreakdown ?: return
 
         if (currentState.routeTo.isBlank() || parseSafeDouble(currentState.distance) <= 0.0) {
-            _effects.emit(CalculatorUiEffect(showMessage = context.getString(R.string.fill_required_fields)))
+            _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.fill_required_fields)))
             return
         }
 
@@ -297,14 +297,14 @@ class CalculatorViewModel @Inject constructor(
             saveHistoryUseCase(calculation)
 
             _effects.emit(CalculatorUiEffect(
-                    showMessage = "${context.getString(R.string.saved)}: ${currentState.routeFrom} → ${currentState.routeTo}"
+                    showMessage = UiText.DynamicString("${context.getString(R.string.saved)}: ${currentState.routeFrom} → ${currentState.routeTo}")
                 )
             )
             _state.update { it.copy(showSuccessMessage = true, isSaving = false) }
         } catch (e: Exception) {
             _state.update { it.copy(isSaving = false, error = e.message) }
             _effects.emit(CalculatorUiEffect(
-                showMessage = "${context.getString(R.string.error)}: ${e.message}")
+                showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}"))
             )
         }
     }

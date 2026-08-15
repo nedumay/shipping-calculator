@@ -64,4 +64,15 @@
     <string name="clear">Clear</string>
     <string name="history_empty">History is empty</string>
     <string name="total_cost">Total cost</string>
+
+    <!-- Analytics Strings -->
+    <string name="analytics">Analytics</string>
+    <string name="total_revenue">Total revenue</string>
+    <string name="total_expenses">Total expenses</string>
+    <string name="net_profit">Net profit</string>
+    <string name="avg_cost_km">Avg. cost per km</string>
+    <string name="most_profitable">Most profitable category</string>
+    <string name="by_category">Profit by category</string>
+    <string name="no_data">No data for analytics</string>
+    <string name="orders_count">orders</string>
 </resources>

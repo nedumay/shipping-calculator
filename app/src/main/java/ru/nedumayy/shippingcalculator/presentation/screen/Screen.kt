@@ -12,4 +12,5 @@ package ru.nedumayy.shippingcalculator.presentation.screen
 sealed class Screen(val route: String) {
     object Calculator : Screen("calculator")
     object History : Screen("history")
+    object Analytics : Screen("analytics")
 }

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,8 +45,8 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val calculations by viewModel.calculations.collectAsState()
-    var showClearDialog by remember { mutableStateOf(false) }
-    var backPressed by remember { mutableStateOf(false) }
+    var showClearDialog by rememberSaveable { mutableStateOf(false) }
+    var backPressed by rememberSaveable { mutableStateOf(false) }
 
     if (showClearDialog) {
         AlertDialog(
@@ -129,7 +130,7 @@ fun HistoryItem(
     calculation: DeliveryCalculation,
     onDelete: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
 
     Card(
