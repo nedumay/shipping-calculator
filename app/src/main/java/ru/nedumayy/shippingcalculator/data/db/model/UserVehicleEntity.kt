@@ -24,5 +24,8 @@ data class UserVehicleEntity(
     val annualMileage: Double,
     val maintenancePerKm: Double,
     val annualInsurance: Double,
-    val hasFuel: Boolean
+    val hasFuel: Boolean,
+    val fuelPrice: Double,
+    val extraExpenses: Double,
+    val marginPercent: Double
 )

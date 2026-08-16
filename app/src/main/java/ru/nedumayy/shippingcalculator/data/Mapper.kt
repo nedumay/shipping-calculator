@@ -81,7 +81,10 @@ fun UserVehicleEntity.toDomain(): UserVehicle = UserVehicle(
     annualMileage = annualMileage,
     maintenancePerKm = maintenancePerKm,
     annualInsurance = annualInsurance,
-    hasFuel = hasFuel
+    hasFuel = hasFuel,
+    fuelPrice = fuelPrice,
+    extraExpenses = extraExpenses,
+    marginPercent = marginPercent
 )
 
 fun UserVehicle.toEntity(): UserVehicleEntity = UserVehicleEntity(
@@ -94,7 +97,10 @@ fun UserVehicle.toEntity(): UserVehicleEntity = UserVehicleEntity(
     annualMileage = annualMileage,
     maintenancePerKm = maintenancePerKm,
     annualInsurance = annualInsurance,
-    hasFuel = hasFuel
+    hasFuel = hasFuel,
+    fuelPrice = fuelPrice,
+    extraExpenses = extraExpenses,
+    marginPercent = marginPercent
 )
 
 fun MaintenanceRecordEntity.toDomain(): MaintenanceRecord = MaintenanceRecord(

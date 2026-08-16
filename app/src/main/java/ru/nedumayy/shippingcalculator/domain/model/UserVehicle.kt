@@ -19,5 +19,8 @@ data class UserVehicle(
     val annualMileage: Double,
     val maintenancePerKm: Double,
     val annualInsurance: Double,
-    val hasFuel: Boolean = true
+    val hasFuel: Boolean = true,
+    val fuelPrice: Double = 0.0,
+    val extraExpenses: Double = 0.0,
+    val marginPercent: Double = 0.0
 )

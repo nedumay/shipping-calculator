@@ -89,7 +89,12 @@ fun CalculatorScreen(
                 scrollBehavior = scrollBehavior
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = Screen.BottomPadding)
+            ) 
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(

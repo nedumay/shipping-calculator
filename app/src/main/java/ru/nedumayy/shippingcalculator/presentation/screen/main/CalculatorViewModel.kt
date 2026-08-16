@@ -182,7 +182,10 @@ class CalculatorViewModel @Inject constructor(
                             annualTax = vehicle.annualTax.toString(),
                             maintenancePerKm = vehicle.maintenancePerKm.toString(),
                             annualInsurance = vehicle.annualInsurance.toString(),
-                            annualMileage = vehicle.annualMileage.toString()
+                            annualMileage = vehicle.annualMileage.toString(),
+                            fuelPrice = if (vehicle.fuelPrice > 0) vehicle.fuelPrice.toString() else it.fuelPrice,
+                            extraExpenses = if (vehicle.extraExpenses > 0) vehicle.extraExpenses.toString() else it.extraExpenses,
+                            marginPercent = if (vehicle.marginPercent > 0) vehicle.marginPercent.toString() else it.marginPercent
                         )
                     }
                 } ?: run {
@@ -218,7 +221,10 @@ class CalculatorViewModel @Inject constructor(
                 annualMileage = parseSafeDouble(currentState.annualMileage),
                 maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm),
                 annualInsurance = parseSafeDouble(currentState.annualInsurance),
-                hasFuel = true 
+                hasFuel = true,
+                fuelPrice = parseSafeDouble(currentState.fuelPrice),
+                extraExpenses = parseSafeDouble(currentState.extraExpenses),
+                marginPercent = parseSafeDouble(currentState.marginPercent)
             )
 
             vehicleRepository.insertUserVehicle(vehicle)
@@ -297,6 +303,22 @@ class CalculatorViewModel @Inject constructor(
             )
 
             saveHistoryUseCase(calculation)
+
+            currentState.selectedUserVehicle?.let { vehicle ->
+                val updatedVehicle = vehicle.copy(
+                    fuelConsumption = parseSafeDouble(currentState.fuelConsumption),
+                    vehiclePrice = parseSafeDouble(currentState.vehiclePrice),
+                    resourceMileage = parseSafeDouble(currentState.resourceMileage),
+                    annualTax = parseSafeDouble(currentState.annualTax),
+                    annualMileage = parseSafeDouble(currentState.annualMileage),
+                    maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm),
+                    annualInsurance = parseSafeDouble(currentState.annualInsurance),
+                    fuelPrice = parseSafeDouble(currentState.fuelPrice),
+                    extraExpenses = parseSafeDouble(currentState.extraExpenses),
+                    marginPercent = parseSafeDouble(currentState.marginPercent)
+                )
+                vehicleRepository.updateUserVehicle(updatedVehicle)
+            }
 
             _effects.emit(CalculatorUiEffect(
                     showMessage = UiText.DynamicString("${context.getString(R.string.saved)}: ${currentState.routeFrom} → ${currentState.routeTo}")
