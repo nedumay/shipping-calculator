@@ -29,12 +29,13 @@ import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.UiText
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.common.parseSafeDouble
-import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiEffect
-import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
+import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiEffect
+import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
 import ru.nedumayy.shippingcalculator.domain.repository.CalculationRepository
+import ru.nedumayy.shippingcalculator.domain.repository.VehicleRepository
 import ru.nedumayy.shippingcalculator.domain.usecase.CalculateDeliveryCostUseCase
 import ru.nedumayy.shippingcalculator.domain.usecase.SaveCalculationHistoryUseCase
 import java.time.LocalDate
@@ -44,7 +45,8 @@ import javax.inject.Inject
 class CalculatorViewModel @Inject constructor(
     private val calculateUseCase: CalculateDeliveryCostUseCase,
     private val saveHistoryUseCase: SaveCalculationHistoryUseCase,
-    private val repository: CalculationRepository,
+    private val calculationRepository: CalculationRepository,
+    private val vehicleRepository: VehicleRepository,
     @ApplicationContext
     private val context: Context
 ) : ViewModel() {
@@ -78,7 +80,7 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun observeUserVehicles() {
-        repository.getAllUserVehicles()
+        vehicleRepository.getAllUserVehicles()
             .onEach { vehicles ->
                 _state.update { it.copy(userVehicles = vehicles) }
             }
@@ -162,7 +164,7 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorEvent.SaveToHistory -> saveToHistory()
             is CalculatorEvent.DeleteFromHistory -> {
                 try {
-                    repository.deleteCalculation(event.id)
+                    calculationRepository.deleteCalculation(event.id)
                 } catch (e: Exception) {
                     _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
                 }
@@ -194,7 +196,7 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorEvent.SaveUserVehicle -> saveUserVehicle()
             is CalculatorEvent.DeleteUserVehicle -> {
                 try {
-                    repository.deleteUserVehicle(event.vehicle)
+                    vehicleRepository.deleteUserVehicle(event.vehicle)
                 } catch (e: Exception) {
                     _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
                 }
@@ -219,7 +221,7 @@ class CalculatorViewModel @Inject constructor(
                 hasFuel = true 
             )
 
-            repository.insertUserVehicle(vehicle)
+            vehicleRepository.insertUserVehicle(vehicle)
             _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
             _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.saved)))
         } catch (e: Exception) {

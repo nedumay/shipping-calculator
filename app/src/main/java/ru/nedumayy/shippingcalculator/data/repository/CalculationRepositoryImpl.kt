@@ -12,23 +12,16 @@ package ru.nedumayy.shippingcalculator.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.nedumayy.shippingcalculator.data.db.dao.CalculationDao
-import ru.nedumayy.shippingcalculator.data.db.dao.SettingsDao
-import ru.nedumayy.shippingcalculator.data.db.dao.UserVehicleDao
-import ru.nedumayy.shippingcalculator.data.db.model.SettingsEntity
 import ru.nedumayy.shippingcalculator.data.toDomain
 import ru.nedumayy.shippingcalculator.data.toEntity
-import ru.nedumayy.shippingcalculator.domain.model.CalculatorSettings
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
-import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.repository.CalculationRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CalculationRepositoryImpl @Inject constructor(
-    private val calculationDao: CalculationDao,
-    private val settingsDao: SettingsDao,
-    private val userVehicleDao: UserVehicleDao
+    private val calculationDao: CalculationDao
 ) : CalculationRepository {
 
     override fun getAllCalculations(): Flow<List<DeliveryCalculation>> {
@@ -47,38 +40,5 @@ class CalculationRepositoryImpl @Inject constructor(
 
     override suspend fun clearHistory() {
         calculationDao.clearHistory()
-    }
-
-    override suspend fun saveCurrentSettings(settings: CalculatorSettings) {
-        settingsDao.saveSettings(
-            SettingsEntity(
-                selectedCategoryId = settings.selectedCategoryId,
-                fuelPrice = settings.fuelPrice,
-                annualMileage = settings.annualMileage,
-                defaultMargin = settings.defaultMargin
-            )
-        )
-    }
-
-    override suspend fun getCurrentSettings(): CalculatorSettings? {
-        return settingsDao.getSettings()?.toDomain()
-    }
-
-    override fun getAllUserVehicles(): Flow<List<UserVehicle>> {
-        return userVehicleDao.getAllVehicles().map { entities ->
-            entities.map { it.toDomain() }
-        }
-    }
-
-    override suspend fun insertUserVehicle(vehicle: UserVehicle) {
-        userVehicleDao.insertVehicle(vehicle.toEntity())
-    }
-
-    override suspend fun deleteUserVehicle(vehicle: UserVehicle) {
-        userVehicleDao.deleteVehicle(vehicle.toEntity())
-    }
-
-    override suspend fun updateUserVehicle(vehicle: UserVehicle) {
-        userVehicleDao.updateVehicle(vehicle.toEntity())
     }
 }

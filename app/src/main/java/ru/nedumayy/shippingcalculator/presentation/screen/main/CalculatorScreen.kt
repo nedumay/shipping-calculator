@@ -42,7 +42,7 @@ import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.parseDate
-import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
+import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
 import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 import java.time.Instant

@@ -10,11 +10,14 @@
 package ru.nedumayy.shippingcalculator.data
 
 import ru.nedumayy.shippingcalculator.data.db.model.CalculationEntity
+import ru.nedumayy.shippingcalculator.data.db.model.MaintenanceRecordEntity
 import ru.nedumayy.shippingcalculator.data.db.model.SettingsEntity
 import ru.nedumayy.shippingcalculator.data.db.model.UserVehicleEntity
 import ru.nedumayy.shippingcalculator.domain.model.CalculatorSettings
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
+import ru.nedumayy.shippingcalculator.domain.model.MaintenanceRecord
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
+import java.util.Date
 
 fun CalculationEntity.toDomain(): DeliveryCalculation = DeliveryCalculation(
     id = id,
@@ -92,4 +95,24 @@ fun UserVehicle.toEntity(): UserVehicleEntity = UserVehicleEntity(
     maintenancePerKm = maintenancePerKm,
     annualInsurance = annualInsurance,
     hasFuel = hasFuel
+)
+
+fun MaintenanceRecordEntity.toDomain(): MaintenanceRecord = MaintenanceRecord(
+    id = id,
+    vehicleId = vehicleId,
+    date = Date(date),
+    mileage = mileage,
+    description = description,
+    cost = cost,
+    category = category
+)
+
+fun MaintenanceRecord.toEntity(): MaintenanceRecordEntity = MaintenanceRecordEntity(
+    id = id,
+    vehicleId = vehicleId,
+    date = date.time,
+    mileage = mileage,
+    description = description,
+    cost = cost,
+    category = category
 )

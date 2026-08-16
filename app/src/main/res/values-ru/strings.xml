@@ -82,4 +82,27 @@
     <string name="screen_history">История</string>
     <string name="screen_analytics">Аналитика</string>
     <string name="screen_maintenance">Обслуживание</string>
+
+    <!-- Maintenance Screen -->
+    <string name="maintenance_log_title">Журнал расходов</string>
+    <string name="add_record">Добавить запись</string>
+    <string name="select_vehicle">Выберите автомобиль</string>
+    <string name="cost_analysis">Анализ затрат</string>
+    <string name="total_costs">Всего затрат</string>
+    <string name="estimated_costs_by_mileage">Расчетные (по пробегу)</string>
+    <string name="savings_per_km">Экономия: %.2f ₽/км</string>
+    <string name="overspending_per_km">Перерасход: %.2f ₽/км</string>
+    <string name="maintenance_history">История обслуживания</string>
+    <string name="add_vehicle_first">Сначала добавьте автомобиль в настройках</string>
+    <string name="add_record_dialog_title">Добавить запись</string>
+    <string name="mileage_label">Пробег (км)</string>
+    <string name="cost_label">Стоимость (₽)</string>
+    <string name="description_label">Описание</string>
+    <string name="category_label">Категория</string>
+    <string name="add">Добавить</string>
+    <string name="category_service">ТО</string>
+    <string name="category_repair">Ремонт</string>
+    <string name="category_tires">Шины</string>
+    <string name="category_consumables">Расходники</string>
+    <string name="category_other">Прочее</string>
 </resources>

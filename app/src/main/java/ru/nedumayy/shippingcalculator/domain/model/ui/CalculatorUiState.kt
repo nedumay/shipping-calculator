@@ -7,9 +7,12 @@
  * @author https://github.com/nedumay
  */
 
-package ru.nedumayy.shippingcalculator.domain.model
+package ru.nedumayy.shippingcalculator.domain.model.ui
 
 import ru.nedumayy.shippingcalculator.common.parseSafeDouble
+import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
+import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
+import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
 import java.time.LocalDate
 
 data class CalculatorUiState(
@@ -17,7 +20,7 @@ data class CalculatorUiState(
     val selectedCategory: VehicleCategory? = null,
     val userVehicles: List<UserVehicle> = emptyList(),
     val selectedUserVehicle: UserVehicle? = null,
-    
+
     val routeFrom: String = "",
     val routeTo: String = "",
     val deliveryDate: String = LocalDate.now().toString(),

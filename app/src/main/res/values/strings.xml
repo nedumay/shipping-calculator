@@ -81,4 +81,27 @@
     <string name="screen_history">History</string>
     <string name="screen_analytics">Analytics</string>
     <string name="screen_maintenance">Maintenance</string>
+
+    <!-- Maintenance Screen -->
+    <string name="maintenance_log_title">Expense Log</string>
+    <string name="add_record">Add record</string>
+    <string name="select_vehicle">Select vehicle</string>
+    <string name="cost_analysis">Cost analysis</string>
+    <string name="total_costs">Total costs</string>
+    <string name="estimated_costs_by_mileage">Estimated (by mileage)</string>
+    <string name="savings_per_km">Savings: %.2f ₽/km</string>
+    <string name="overspending_per_km">Overspending: %.2f ₽/km</string>
+    <string name="maintenance_history">Maintenance history</string>
+    <string name="add_vehicle_first">Add a vehicle in settings first</string>
+    <string name="add_record_dialog_title">Add entry</string>
+    <string name="mileage_label">Mileage (km)</string>
+    <string name="cost_label">Cost (₽)</string>
+    <string name="description_label">Description</string>
+    <string name="category_label">Category</string>
+    <string name="add">Add</string>
+    <string name="category_service">Service</string>
+    <string name="category_repair">Repair</string>
+    <string name="category_tires">Tires</string>
+    <string name="category_consumables">Consumables</string>
+    <string name="category_other">Other</string>
 </resources>

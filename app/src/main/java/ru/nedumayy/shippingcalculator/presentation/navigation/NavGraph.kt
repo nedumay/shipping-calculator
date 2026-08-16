@@ -32,7 +32,7 @@ fun NavGraph(navController: NavHostController) {
             AnalyticsScreen()
         }
         composable(Screen.Maintenance.route) {
-            //MaintenanceScreen()
+            MaintenanceScreen()
         }
     }
 }
