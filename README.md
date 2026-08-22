@@ -10,7 +10,9 @@
 
 ### Features
 
-*   **Vehicle Profiles:** Save and manage different vehicles (Moped, Car, Van, Truck).
+*   **Vehicle Profiles & Garage:** Save and manage different vehicles (Moped, Car, Van, Truck). Track specific parameters for each vehicle, including fuel type (Petrol, Diesel, Gas, Electricity).
+*   **Maintenance & Expense Log:** Record all maintenance activities (Service, Repair, Tires, etc.) to track real costs.
+*   **Cost Analysis (TCO):** Automatic calculation of Total Cost of Ownership per kilometer. Compare real maintenance expenses with estimated costs based on mileage.
 *   **Comprehensive Calculation:**
     *   **Fuel:** Based on distance, consumption, and price per liter.
     *   **Depreciation:** Calculate vehicle wear and tear based on price and resource mileage.
@@ -40,7 +42,9 @@
 
 ### Основные возможности
 
-*   **Профили транспорта:** Сохранение и управление различными транспортными средствами (Мопед, Легковой авто, Фургон, Грузовик).
+*   **Профили транспорта и Гараж:** Сохранение и управление различными транспортными средствами (Мопед, Легковой авто, Фургон, Грузовик). Настройка параметров для каждого авто, включая тип топлива (Бензин, Дизель, Газ, Электричество).
+*   **Журнал обслуживания и расходов:** Учет всех сервисных работ (ТО, Ремонт, Шины и др.) для отслеживания реальных затрат.
+*   **Анализ стоимости (TCO):** Автоматический расчет полной стоимости владения (Total Cost of Ownership) на километр. Сравнение реальных расходов на обслуживание с расчетными показателями.
 *   **Комплексный расчет:**
     *   **Топливо:** На основе расстояния, расхода и цены за литр.
     *   **Амортизация:** Расчет износа автомобиля на основе его цены и общего ресурса.
