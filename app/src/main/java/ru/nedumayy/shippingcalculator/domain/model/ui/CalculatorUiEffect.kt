@@ -7,7 +7,7 @@
  * @author https://github.com/nedumay
  */
 
-package ru.nedumayy.shippingcalculator.domain.model
+package ru.nedumayy.shippingcalculator.domain.model.ui
 
 import ru.nedumayy.shippingcalculator.common.UiText
 

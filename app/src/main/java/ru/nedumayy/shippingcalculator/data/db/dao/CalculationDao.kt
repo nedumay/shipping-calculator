@@ -15,21 +15,21 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import ru.nedumayy.shippingcalculator.data.db.model.CalculationEntity
+import ru.nedumayy.shippingcalculator.data.db.model.DeliveryCalculationEntity
 
 @Dao
 interface CalculationDao {
     @Query("SELECT * FROM calculations ORDER BY createdAt DESC")
-    fun getAllCalculations(): Flow<List<CalculationEntity>>
+    fun getAllCalculations(): Flow<List<DeliveryCalculationEntity>>
 
     @Query("SELECT * FROM calculations WHERE id = :id")
-    suspend fun getCalculationById(id: Long): CalculationEntity?
+    suspend fun getCalculationById(id: Long): DeliveryCalculationEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCalculation(calculation: CalculationEntity): Long
+    suspend fun insertCalculation(calculation: DeliveryCalculationEntity): Long
 
     @Delete
-    suspend fun deleteCalculation(calculation: CalculationEntity)
+    suspend fun deleteCalculation(calculation: DeliveryCalculationEntity)
 
     @Query("DELETE FROM calculations WHERE id = :id")
     suspend fun deleteCalculationById(id: Long)

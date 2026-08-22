@@ -20,9 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,8 +42,9 @@ import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.parseDate
-import ru.nedumayy.shippingcalculator.domain.model.CalculatorUiState
+import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
+import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -53,9 +52,7 @@ import java.time.ZoneOffset
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreen(
-    viewModel: CalculatorViewModel = hiltViewModel(),
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToAnalytics: () -> Unit = {},
+    viewModel: CalculatorViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -89,26 +86,15 @@ fun CalculatorScreen(
                         fontWeight = FontWeight.Bold
                     )
                 },
-                actions = {
-                    IconButton(onClick = onNavigateToAnalytics) {
-                        Icon(
-                            imageVector = Icons.Filled.Info,
-                            contentDescription = stringResource(R.string.analytics),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(onClick = onNavigateToHistory) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.List,
-                            contentDescription = stringResource(R.string.calculation_history),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
                 scrollBehavior = scrollBehavior
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = Screen.BottomPadding)
+            ) 
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
@@ -253,6 +239,49 @@ fun CalculatorScreen(
 
             AnimatedVisibility(visible = state.selectedCategory?.hasFuel != false) {
                 InputGroupCard(title = stringResource(R.string.fuel)) {
+                    val fuelTypes = listOf(
+                        stringResource(R.string.fuel_type_petrol),
+                        stringResource(R.string.fuel_type_diesel),
+                        stringResource(R.string.fuel_type_gas),
+                        stringResource(R.string.fuel_type_electricity)
+                    )
+                    var fuelTypeExpanded by remember { mutableStateOf(false) }
+
+                    ExposedDropdownMenuBox(
+                        expanded = fuelTypeExpanded,
+                        onExpandedChange = { fuelTypeExpanded = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = state.fuelType,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.fuel_type)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelTypeExpanded) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = fuelTypeExpanded,
+                            onDismissRequest = { fuelTypeExpanded = false }
+                        ) {
+                            fuelTypes.forEach { type ->
+                                DropdownMenuItem(
+                                    text = { Text(type) },
+                                    onClick = {
+                                        viewModel.onEvent(CalculatorEvent.FuelTypeChanged(type))
+                                        fuelTypeExpanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
+                            }
+                        }
+                    }
+
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         NumberField(
                             label = stringResource(R.string.fuel_consumption),
@@ -386,7 +415,7 @@ fun CalculatorScreen(
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(Screen.BottomPadding))
         }
     }
 }

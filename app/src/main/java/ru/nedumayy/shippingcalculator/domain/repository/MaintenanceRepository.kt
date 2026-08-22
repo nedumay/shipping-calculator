@@ -10,11 +10,10 @@
 package ru.nedumayy.shippingcalculator.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
+import ru.nedumayy.shippingcalculator.domain.model.MaintenanceRecord
 
-interface CalculationRepository {
-    fun getAllCalculations(): Flow<List<DeliveryCalculation>>
-    suspend fun insertCalculation(calculation: DeliveryCalculation)
-    suspend fun deleteCalculation(id: Long)
-    suspend fun clearHistory()
+interface MaintenanceRepository {
+    fun getMaintenanceRecords(vehicleId: Long): Flow<List<MaintenanceRecord>>
+    suspend fun insertMaintenanceRecord(record: MaintenanceRecord)
+    suspend fun deleteMaintenanceRecord(record: MaintenanceRecord)
 }
