@@ -13,6 +13,7 @@ import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,7 +24,7 @@ sealed class Screen(val route: String, @StringRes val titleRes: Int, val icon: I
     object Calculator : Screen("calculator", R.string.screen_calculator, Icons.Default.Home)
     object History : Screen("history", R.string.screen_history, Icons.AutoMirrored.Filled.List)
     object Analytics : Screen("analytics", R.string.screen_analytics, Icons.Default.Info)
-    object Maintenance : Screen("maintenance", R.string.screen_maintenance, Icons.Default.Build)
+    object Vehicles : Screen("vehicles", R.string.screen_vehicles, Icons.Default.DirectionsCar)
 
     companion object {
         val BottomPadding = 130.dp
@@ -33,7 +34,7 @@ sealed class Screen(val route: String, @StringRes val titleRes: Int, val icon: I
                 Calculator,
                 History,
                 Analytics,
-                Maintenance
+                Vehicles
             )
     }
 }

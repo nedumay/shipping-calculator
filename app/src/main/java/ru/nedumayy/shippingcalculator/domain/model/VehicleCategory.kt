@@ -18,8 +18,14 @@ data class VehicleCategory(
     val vehiclePrice: Double,
     val resourceMileage: Double,
     val annualTax: Double,
+    val annualInsurance: Double,
     val annualMileage: Double,
     val maintenancePerKm: Double,
-    val annualInsurance: Double,
     val hasFuel: Boolean
-)
+) {
+    val taxPerKm: Double
+        get() = if (annualMileage > 0) annualTax / annualMileage else 0.0
+
+    val insurancePerKm: Double
+        get() = if (annualMileage > 0) annualInsurance / annualMileage else 0.0
+}

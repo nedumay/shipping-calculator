@@ -20,8 +20,7 @@ class CalculateDeliveryCostUseCase @Inject constructor() {
         distance: Double,
         fuelPrice: Double,
         extraExpenses: Double,
-        marginPercent: Double,
-        annualMileage: Double
+        marginPercent: Double
     ): CostBreakdown {
         val fuelPerKm = if (category.hasFuel) {
             (category.fuelConsumption / 100.0) * fuelPrice
@@ -31,13 +30,8 @@ class CalculateDeliveryCostUseCase @Inject constructor() {
             category.vehiclePrice / category.resourceMileage
         } else 0.0
 
-        val taxPerKm = if (annualMileage > 0) {
-            category.annualTax / annualMileage
-        } else 0.0
-
-        val insurancePerKm = if (annualMileage > 0) {
-            category.annualInsurance / annualMileage
-        } else 0.0
+        val taxPerKm = category.taxPerKm
+        val insurancePerKm = category.insurancePerKm
 
         val costPerKm = fuelPerKm + depreciationPerKm + taxPerKm +
                 category.maintenancePerKm + insurancePerKm

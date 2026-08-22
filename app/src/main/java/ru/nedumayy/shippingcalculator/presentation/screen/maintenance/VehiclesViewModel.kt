@@ -1,3 +1,12 @@
+/**
+ * Copyright © 2026 Nedumay.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ * @author https://github.com/nedumay
+ */
+
 package ru.nedumayy.shippingcalculator.presentation.screen.maintenance
 
 import androidx.lifecycle.ViewModel
@@ -8,24 +17,22 @@ import kotlinx.coroutines.launch
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceCategory
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceRecord
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
-import ru.nedumayy.shippingcalculator.domain.model.ui.MaintenanceUiState
-import ru.nedumayy.shippingcalculator.domain.usecase.maintenance.AddMaintenanceRecordUseCase
-import ru.nedumayy.shippingcalculator.domain.usecase.maintenance.DeleteMaintenanceRecordUseCase
-import ru.nedumayy.shippingcalculator.domain.usecase.maintenance.GetMaintenanceRecordsUseCase
-import ru.nedumayy.shippingcalculator.domain.usecase.maintenance.GetVehiclesUseCase
+import ru.nedumayy.shippingcalculator.domain.model.ui.VehiclesUiState
+import ru.nedumayy.shippingcalculator.domain.usecase.maintenance.*
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class MaintenanceViewModel @Inject constructor(
+class VehiclesViewModel @Inject constructor(
     private val getVehiclesUseCase: GetVehiclesUseCase,
     private val getMaintenanceRecordsUseCase: GetMaintenanceRecordsUseCase,
     private val addMaintenanceRecordUseCase: AddMaintenanceRecordUseCase,
-    private val deleteMaintenanceRecordUseCase: DeleteMaintenanceRecordUseCase
+    private val deleteMaintenanceRecordUseCase: DeleteMaintenanceRecordUseCase,
+    private val updateUserVehicleUseCase: UpdateUserVehicleUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MaintenanceUiState())
-    val uiState: StateFlow<MaintenanceUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(VehiclesUiState())
+    val uiState: StateFlow<VehiclesUiState> = _uiState.asStateFlow()
 
     init {
         loadVehicles()
@@ -73,6 +80,14 @@ class MaintenanceViewModel @Inject constructor(
                 costDifferencePerKm = diffPerKm,
                 isLoading = false
             )
+        }
+    }
+
+    fun updateProfile(updatedVehicle: UserVehicle) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) }
+            updateUserVehicleUseCase(updatedVehicle)
+            _uiState.update { it.copy(selectedVehicle = updatedVehicle, isSaving = false) }
         }
     }
 

@@ -9,7 +9,7 @@
 
 package ru.nedumayy.shippingcalculator.data
 
-import ru.nedumayy.shippingcalculator.data.db.model.CalculationEntity
+import ru.nedumayy.shippingcalculator.data.db.model.DeliveryCalculationEntity
 import ru.nedumayy.shippingcalculator.data.db.model.MaintenanceRecordEntity
 import ru.nedumayy.shippingcalculator.data.db.model.SettingsEntity
 import ru.nedumayy.shippingcalculator.data.db.model.UserVehicleEntity
@@ -19,11 +19,12 @@ import ru.nedumayy.shippingcalculator.domain.model.MaintenanceRecord
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import java.util.Date
 
-fun CalculationEntity.toDomain(): DeliveryCalculation = DeliveryCalculation(
+fun DeliveryCalculationEntity.toDomain(): DeliveryCalculation = DeliveryCalculation(
     id = id,
     categoryName = categoryName,
     routeFrom = routeFrom,
     routeTo = routeTo,
+    fuelType = fuelType,
     deliveryDate = deliveryDate,
     distance = distance,
     fuelCost = fuelCost,
@@ -38,11 +39,12 @@ fun CalculationEntity.toDomain(): DeliveryCalculation = DeliveryCalculation(
     createdAt = createdAt
 )
 
-fun DeliveryCalculation.toEntity(): CalculationEntity = CalculationEntity(
+fun DeliveryCalculation.toEntity(): DeliveryCalculationEntity = DeliveryCalculationEntity(
     id = id,
     categoryName = categoryName,
     routeFrom = routeFrom,
     routeTo = routeTo,
+    fuelType = fuelType,
     deliveryDate = deliveryDate,
     distance = distance,
     fuelCost = fuelCost,
@@ -74,15 +76,16 @@ fun CalculatorSettings.toEntity(): SettingsEntity = SettingsEntity(
 fun UserVehicleEntity.toDomain(): UserVehicle = UserVehicle(
     id = id,
     name = name,
+    fuelType = fuelType,
     fuelConsumption = fuelConsumption,
+    fuelPrice = fuelPrice,
     vehiclePrice = vehiclePrice,
     resourceMileage = resourceMileage,
-    annualTax = annualTax,
-    annualMileage = annualMileage,
     maintenancePerKm = maintenancePerKm,
+    annualTax = annualTax,
     annualInsurance = annualInsurance,
+    annualMileage = annualMileage,
     hasFuel = hasFuel,
-    fuelPrice = fuelPrice,
     extraExpenses = extraExpenses,
     marginPercent = marginPercent
 )
@@ -90,15 +93,16 @@ fun UserVehicleEntity.toDomain(): UserVehicle = UserVehicle(
 fun UserVehicle.toEntity(): UserVehicleEntity = UserVehicleEntity(
     id = id,
     name = name,
+    fuelType = fuelType,
     fuelConsumption = fuelConsumption,
+    fuelPrice = fuelPrice,
     vehiclePrice = vehiclePrice,
     resourceMileage = resourceMileage,
-    annualTax = annualTax,
-    annualMileage = annualMileage,
     maintenancePerKm = maintenancePerKm,
+    annualTax = annualTax,
     annualInsurance = annualInsurance,
+    annualMileage = annualMileage,
     hasFuel = hasFuel,
-    fuelPrice = fuelPrice,
     extraExpenses = extraExpenses,
     marginPercent = marginPercent
 )

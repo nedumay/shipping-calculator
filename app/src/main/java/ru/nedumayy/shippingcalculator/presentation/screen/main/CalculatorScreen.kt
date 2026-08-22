@@ -239,6 +239,49 @@ fun CalculatorScreen(
 
             AnimatedVisibility(visible = state.selectedCategory?.hasFuel != false) {
                 InputGroupCard(title = stringResource(R.string.fuel)) {
+                    val fuelTypes = listOf(
+                        stringResource(R.string.fuel_type_petrol),
+                        stringResource(R.string.fuel_type_diesel),
+                        stringResource(R.string.fuel_type_gas),
+                        stringResource(R.string.fuel_type_electricity)
+                    )
+                    var fuelTypeExpanded by remember { mutableStateOf(false) }
+
+                    ExposedDropdownMenuBox(
+                        expanded = fuelTypeExpanded,
+                        onExpandedChange = { fuelTypeExpanded = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = state.fuelType,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.fuel_type)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelTypeExpanded) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = fuelTypeExpanded,
+                            onDismissRequest = { fuelTypeExpanded = false }
+                        ) {
+                            fuelTypes.forEach { type ->
+                                DropdownMenuItem(
+                                    text = { Text(type) },
+                                    onClick = {
+                                        viewModel.onEvent(CalculatorEvent.FuelTypeChanged(type))
+                                        fuelTypeExpanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
+                            }
+                        }
+                    }
+
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         NumberField(
                             label = stringResource(R.string.fuel_consumption),

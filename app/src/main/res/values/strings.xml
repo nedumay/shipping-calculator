@@ -31,14 +31,18 @@
     <string name="fuel">Fuel</string>
     <string name="fuel_consumption">Fuel consumption, L/100 km</string>
     <string name="price_per_liter">Price, ₽/L</string>
+    <string name="fuel_type_petrol">Petrol</string>
+    <string name="fuel_type_diesel">Diesel</string>
+    <string name="fuel_type_gas">Gas</string>
+    <string name="fuel_type_electricity">Electricity</string>
 
     <string name="depreciation">Depreciation</string>
     <string name="vehicle_price">Vehicle price, ₽</string>
     <string name="resource_mileage">Resource, km</string>
-    <string name="taxes_and_other">Taxes and other</string>
+    <string name="taxes_and_other">Other</string>
     <string name="annual_tax">Annual tax, ₽</string>
     <string name="annual_mileage">Annual mileage, km</string>
-    <string name="maintenance_and_insurance">Maintenance and insurance</string>
+    <string name="maintenance_and_insurance">Tax, maintenance and insurance</string>
     <string name="maintenance_per_km">Maintenance, ₽/km</string>
     <string name="annual_insurance">Annual insurance, ₽</string>
     <string name="insurance">Insurance</string>
@@ -79,11 +83,19 @@
     <!-- Screen Titles -->
     <string name="screen_calculator">Calculator</string>
     <string name="screen_history">History</string>
+    <string name="screen_vehicles">Garage</string>
     <string name="screen_analytics">Analytics</string>
-    <string name="screen_maintenance">Maintenance</string>
 
     <!-- Maintenance Screen -->
     <string name="maintenance_log_title">Expense Log</string>
+    <string name="vehicle_profile">Vehicle Profile</string>
+    <string name="fuel_type">Fuel type</string>
+    <string name="fuel_price_label">Fuel price (₽/L)</string>
+    <string name="insurance_per_km_label">Insurance (₽/km)</string>
+    <string name="tax_per_km_label">Tax (₽/km)</string>
+    <string name="tco_label">Total cost per km (TCO)</string>
+    <string name="save_profile">Save Profile</string>
+    <string name="profile_saved">Profile saved</string>
     <string name="add_record">Add record</string>
     <string name="select_vehicle">Select vehicle</string>
     <string name="cost_analysis">Cost analysis</string>

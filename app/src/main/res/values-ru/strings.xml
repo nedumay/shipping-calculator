@@ -30,16 +30,20 @@
     <string name="delivery_date">Дата доставки</string>
     <string name="distance">Расстояние, км</string>
     <string name="fuel">Топливо</string>
-    <string name="fuel_consumption">Расход, л/100км</string>
+    <string name="fuel_consumption">Расход, л/100 км</string>
     <string name="price_per_liter">Цена, ₽/л</string>
+    <string name="fuel_type_petrol">Бензин</string>
+    <string name="fuel_type_diesel">Дизель</string>
+    <string name="fuel_type_gas">Газ</string>
+    <string name="fuel_type_electricity">Электричество</string>
 
     <string name="depreciation">Амортизация</string>
     <string name="vehicle_price">Стоимость ТС, ₽</string>
     <string name="resource_mileage">Ресурс, км</string>
-    <string name="taxes_and_other">Налог и прочее</string>
+    <string name="taxes_and_other">Прочее</string>
     <string name="annual_tax">Налог/год, ₽</string>
     <string name="annual_mileage">Пробег/год, км</string>
-    <string name="maintenance_and_insurance">ТО и страховка</string>
+    <string name="maintenance_and_insurance">Налоги, ТО и страховка</string>
     <string name="maintenance_per_km">ТО, ₽/км</string>
     <string name="annual_insurance">Страховка/год, ₽</string>
     <string name="insurance">Страховка</string>
@@ -80,11 +84,19 @@
     <!-- Screen Titles -->
     <string name="screen_calculator">Расчет</string>
     <string name="screen_history">История</string>
+    <string name="screen_vehicles">Гараж</string>
     <string name="screen_analytics">Аналитика</string>
-    <string name="screen_maintenance">Обслуживание</string>
 
     <!-- Maintenance Screen -->
     <string name="maintenance_log_title">Журнал расходов</string>
+    <string name="vehicle_profile">Профиль ТС</string>
+    <string name="fuel_type">Тип топлива</string>
+    <string name="fuel_price_label">Цена топлива (₽/л)</string>
+    <string name="insurance_per_km_label">Страховка (₽/км)</string>
+    <string name="tax_per_km_label">Налог (₽/км)</string>
+    <string name="tco_label">Общая стоимость на км (TCO)</string>
+    <string name="save_profile">Сохранить профиль</string>
+    <string name="profile_saved">Профиль сохранен</string>
     <string name="add_record">Добавить запись</string>
     <string name="select_vehicle">Выберите автомобиль</string>
     <string name="cost_analysis">Анализ затрат</string>

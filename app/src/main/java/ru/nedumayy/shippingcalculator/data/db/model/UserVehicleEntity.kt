@@ -17,15 +17,16 @@ data class UserVehicleEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
+    val fuelType: String,
     val fuelConsumption: Double,
+    val fuelPrice: Double,
     val vehiclePrice: Double,
     val resourceMileage: Double,
-    val annualTax: Double,
-    val annualMileage: Double,
     val maintenancePerKm: Double,
+    val annualTax: Double,
     val annualInsurance: Double,
+    val annualMileage: Double,
     val hasFuel: Boolean,
-    val fuelPrice: Double,
     val extraExpenses: Double,
     val marginPercent: Double
 )

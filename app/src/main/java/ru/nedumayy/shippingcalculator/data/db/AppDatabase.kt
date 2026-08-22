@@ -16,19 +16,19 @@ import ru.nedumayy.shippingcalculator.data.db.dao.CalculationDao
 import ru.nedumayy.shippingcalculator.data.db.dao.MaintenanceDao
 import ru.nedumayy.shippingcalculator.data.db.dao.SettingsDao
 import ru.nedumayy.shippingcalculator.data.db.dao.UserVehicleDao
-import ru.nedumayy.shippingcalculator.data.db.model.CalculationEntity
+import ru.nedumayy.shippingcalculator.data.db.model.DeliveryCalculationEntity
 import ru.nedumayy.shippingcalculator.data.db.model.MaintenanceRecordEntity
 import ru.nedumayy.shippingcalculator.data.db.model.SettingsEntity
 import ru.nedumayy.shippingcalculator.data.db.model.UserVehicleEntity
 
 @Database(
     entities = [
-        CalculationEntity::class,
+        DeliveryCalculationEntity::class,
         SettingsEntity::class,
         UserVehicleEntity::class,
         MaintenanceRecordEntity::class
     ],
-    version = 4,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
