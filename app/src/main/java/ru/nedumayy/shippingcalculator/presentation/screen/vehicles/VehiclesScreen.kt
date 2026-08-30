@@ -212,19 +212,36 @@ fun VehicleProfileTab(
                     }
                 }
             }
+            val isElectric = fuelType == stringResource(R.string.fuel_type_electricity)
             OutlinedTextField(
                 value = consumption,
                 onValueChange = { consumption = it },
-                label = { Text(stringResource(R.string.fuel_consumption)) },
+                label = { 
+                    Text(
+                        stringResource(
+                            if (isElectric) R.string.fuel_consumption_electric 
+                            else R.string.fuel_consumption
+                        )
+                    ) 
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.weight(1f)
             )
         }
 
+        val isElectric = fuelType == stringResource(R.string.fuel_type_electricity)
+
         OutlinedTextField(
             value = fuelPrice,
             onValueChange = { fuelPrice = it },
-            label = { Text(stringResource(R.string.fuel_price_label)) },
+            label = { 
+                Text(
+                    stringResource(
+                        if (isElectric) R.string.fuel_price_electric_label 
+                        else R.string.fuel_price_label
+                    )
+                ) 
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth()
         )

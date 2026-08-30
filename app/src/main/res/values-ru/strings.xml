@@ -31,7 +31,9 @@
     <string name="distance">Расстояние, км</string>
     <string name="fuel">Топливо</string>
     <string name="fuel_consumption">Расход, л/100 км</string>
+    <string name="fuel_consumption_electric">Расход, кВт·ч/100 км</string>
     <string name="price_per_liter">Цена, ₽/л</string>
+    <string name="price_per_kwh">Цена, ₽/кВт·ч</string>
     <string name="fuel_type_petrol">Бензин</string>
     <string name="fuel_type_diesel">Дизель</string>
     <string name="fuel_type_gas">Газ</string>
@@ -92,6 +94,7 @@
     <string name="vehicle_profile">Профиль ТС</string>
     <string name="fuel_type">Тип топлива</string>
     <string name="fuel_price_label">Цена топлива (₽/л)</string>
+    <string name="fuel_price_electric_label">Цена электричества (₽/кВт·ч)</string>
     <string name="insurance_per_km_label">Страховка (₽/км)</string>
     <string name="tax_per_km_label">Налог (₽/км)</string>
     <string name="tco_label">Общая стоимость на км (TCO)</string>

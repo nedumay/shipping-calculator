@@ -284,15 +284,22 @@ fun CalculatorScreen(
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val isElectric = state.fuelType == stringResource(R.string.fuel_type_electricity)
                         NumberField(
-                            label = stringResource(R.string.fuel_consumption),
+                            label = stringResource(
+                                if (isElectric) R.string.fuel_consumption_electric 
+                                else R.string.fuel_consumption
+                            ),
                             value = state.fuelConsumption,
                             placeholder = state.selectedCategory?.fuelConsumption?.toString() ?: "0",
-                            suffix = "л/100",
+                            suffix = if (isElectric) "кВт·ч/100" else "л/100",
                             modifier = Modifier.weight(1f)
                         ) { viewModel.onEvent(CalculatorEvent.FuelConsumptionChanged(it)) }
                         NumberField(
-                            label = stringResource(R.string.price_per_liter),
+                            label = stringResource(
+                                if (isElectric) R.string.price_per_kwh 
+                                else R.string.price_per_liter
+                            ),
                             value = state.fuelPrice,
                             placeholder = "58",
                             suffix = "₽",
