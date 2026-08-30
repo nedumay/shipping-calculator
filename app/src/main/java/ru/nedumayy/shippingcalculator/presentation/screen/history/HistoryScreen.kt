@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
@@ -44,7 +45,7 @@ import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
-    val calculations by viewModel.calculations.collectAsState()
+    val calculations by viewModel.calculations.collectAsStateWithLifecycle()
     var showClearDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showClearDialog) {
@@ -80,7 +81,8 @@ fun HistoryScreen(
                     }
                 }
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (calculations.isEmpty()) {
             Box(

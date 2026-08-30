@@ -36,7 +36,8 @@ fun AnalyticsScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.analytics), fontWeight = FontWeight.Bold) }
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (state.categoryStats.isEmpty()) {
             Box(

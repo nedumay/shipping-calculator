@@ -7,7 +7,7 @@
  * @author https://github.com/nedumay
  */
 
-package ru.nedumayy.shippingcalculator.presentation.screen.maintenance
+package ru.nedumayy.shippingcalculator.presentation.screen.vehicles
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceCategory
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceRecord
@@ -46,7 +47,7 @@ import java.util.*
 fun VehiclesScreen(
     viewModel: VehiclesViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var showAddRecordDialog by remember { mutableStateOf(false) }
 
@@ -61,9 +62,13 @@ fun VehiclesScreen(
                 }
             )
         },
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             if (selectedTabIndex == 1 && uiState.selectedVehicle != null) {
-                FloatingActionButton(onClick = { showAddRecordDialog = true }) {
+                FloatingActionButton(
+                    onClick = { showAddRecordDialog = true },
+                    modifier = Modifier.padding(bottom = Screen.BottomPadding)
+                ) {
                     Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_record))
                 }
             }
@@ -73,7 +78,6 @@ fun VehiclesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(bottom = Screen.BottomPadding)
         ) {
             if (uiState.vehicles.isEmpty()) {
                 EmptyVehiclesState()
@@ -98,11 +102,13 @@ fun VehiclesScreen(
                 }
 
                 when (selectedTabIndex) {
-                    0 -> VehicleProfileTab(
-                        vehicle = uiState.selectedVehicle!!,
-                        isSaving = uiState.isSaving,
-                        onSave = { viewModel.updateProfile(it) }
-                    )
+                    0 -> uiState.selectedVehicle?.let { vehicle ->
+                        VehicleProfileTab(
+                            vehicle = vehicle,
+                            isSaving = uiState.isSaving,
+                            onSave = { viewModel.updateProfile(it) }
+                        )
+                    }
                     1 -> {
                         Column {
                             SummaryCard(
@@ -305,6 +311,8 @@ fun VehicleProfileTab(
                 Text(stringResource(R.string.save_profile))
             }
         }
+        
+        Spacer(Modifier.height(Screen.BottomPadding))
     }
 }
 
@@ -470,12 +478,20 @@ fun RecordsList(
     
     if (records.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.history_empty), style = MaterialTheme.typography.bodyMedium)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(stringResource(R.string.history_empty), style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(Screen.BottomPadding))
+            }
         }
     } else {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = Screen.BottomPadding
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(records) { record ->
@@ -563,11 +579,14 @@ fun CategoryBadge(category: MaintenanceCategory) {
 @Composable
 fun EmptyVehiclesState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = stringResource(R.string.add_vehicle_first),
-            modifier = Modifier.padding(32.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.add_vehicle_first),
+                modifier = Modifier.padding(32.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Spacer(Modifier.height(Screen.BottomPadding))
+        }
     }
 }
 
@@ -608,9 +627,9 @@ fun AddMaintenanceDialog(
                 )
                 
                 Text(stringResource(R.string.category_label), style = MaterialTheme.typography.labelMedium)
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     MaintenanceCategory.entries.forEach { category ->
                         val isSelected = selectedCategory == category
@@ -624,8 +643,14 @@ fun AddMaintenanceDialog(
                         FilterChip(
                             selected = isSelected,
                             onClick = { selectedCategory = category },
-                            label = { Text(stringResource(categoryTextRes)) },
-                            modifier = Modifier.weight(1f)
+                            label = { 
+                                Text(
+                                    text = stringResource(categoryTextRes),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                ) 
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

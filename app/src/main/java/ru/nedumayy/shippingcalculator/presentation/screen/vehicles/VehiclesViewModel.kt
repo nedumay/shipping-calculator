@@ -7,11 +7,12 @@
  * @author https://github.com/nedumay
  */
 
-package ru.nedumayy.shippingcalculator.presentation.screen.maintenance
+package ru.nedumayy.shippingcalculator.presentation.screen.vehicles
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceCategory
@@ -22,6 +23,7 @@ import ru.nedumayy.shippingcalculator.domain.usecase.maintenance.*
 import java.util.*
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class VehiclesViewModel @Inject constructor(
     private val getVehiclesUseCase: GetVehiclesUseCase,
@@ -34,28 +36,40 @@ class VehiclesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(VehiclesUiState())
     val uiState: StateFlow<VehiclesUiState> = _uiState.asStateFlow()
 
+    private val _selectedVehicleId = MutableStateFlow<Long?>(null)
+
     init {
         loadVehicles()
+        observeMaintenanceRecords()
     }
 
     private fun loadVehicles() {
-        viewModelScope.launch {
-            getVehiclesUseCase().collect { vehicles ->
+        getVehiclesUseCase()
+            .onEach { vehicles ->
                 _uiState.update { it.copy(vehicles = vehicles) }
                 if (vehicles.isNotEmpty() && _uiState.value.selectedVehicle == null) {
                     selectVehicle(vehicles.first())
                 }
             }
-        }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeMaintenanceRecords() {
+        _selectedVehicleId
+            .filterNotNull()
+            .flatMapLatest { vehicleId ->
+                getMaintenanceRecordsUseCase(vehicleId)
+            }
+            .onEach { records ->
+                val vehicle = _uiState.value.selectedVehicle ?: return@onEach
+                calculateStats(vehicle, records)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun selectVehicle(vehicle: UserVehicle) {
         _uiState.update { it.copy(selectedVehicle = vehicle, isLoading = true) }
-        viewModelScope.launch {
-            getMaintenanceRecordsUseCase(vehicle.id).collect { records ->
-                calculateStats(vehicle, records)
-            }
-        }
+        _selectedVehicleId.value = vehicle.id
     }
 
     private fun calculateStats(vehicle: UserVehicle, records: List<MaintenanceRecord>) {

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.formatDate
@@ -54,7 +55,7 @@ import java.time.ZoneOffset
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val context = LocalContext.current
@@ -377,8 +378,15 @@ fun CalculatorScreen(
 
             Spacer(Modifier.height(24.dp))
 
+            val categoryName = state.selectedUserVehicle?.name 
+                ?: state.selectedCategory?.label?.asString(context) 
+                ?: ""
+            val routeFromFallback = stringResource(R.string.not_specified)
+            
             ElevatedButton(
-                onClick = { viewModel.onEvent(CalculatorEvent.SaveToHistory) },
+                onClick = { 
+                    viewModel.onEvent(CalculatorEvent.SaveToHistory(categoryName, routeFromFallback)) 
+                },
                 enabled = state.canSave && !state.isSaving,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -17,7 +17,7 @@ import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 import ru.nedumayy.shippingcalculator.presentation.screen.analytics.AnalyticsScreen
 import ru.nedumayy.shippingcalculator.presentation.screen.history.HistoryScreen
 import ru.nedumayy.shippingcalculator.presentation.screen.main.CalculatorScreen
-import ru.nedumayy.shippingcalculator.presentation.screen.maintenance.VehiclesScreen
+import ru.nedumayy.shippingcalculator.presentation.screen.vehicles.VehiclesScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
