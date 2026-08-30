@@ -9,11 +9,9 @@
 
 package ru.nedumayy.shippingcalculator.presentation.screen.main
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -46,9 +44,7 @@ class CalculatorViewModel @Inject constructor(
     private val calculateUseCase: CalculateDeliveryCostUseCase,
     private val saveHistoryUseCase: SaveCalculationHistoryUseCase,
     private val calculationRepository: CalculationRepository,
-    private val vehicleRepository: VehicleRepository,
-    @ApplicationContext
-    private val context: Context
+    private val vehicleRepository: VehicleRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CalculatorUiState())
@@ -162,12 +158,12 @@ class CalculatorViewModel @Inject constructor(
                 _state.update { it.copy(maintenancePerKm = event.value) }
                 calculateCost()
             }
-            is CalculatorEvent.SaveToHistory -> saveToHistory()
+            is CalculatorEvent.SaveToHistory -> saveToHistory(event.categoryName, event.routeFromFallback)
             is CalculatorEvent.DeleteFromHistory -> {
                 try {
                     calculationRepository.deleteCalculation(event.id)
                 } catch (e: Exception) {
-                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
+                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString(e.message ?: "Unknown error")))
                 }
             }
             
@@ -203,7 +199,7 @@ class CalculatorViewModel @Inject constructor(
                 try {
                     vehicleRepository.deleteUserVehicle(event.vehicle)
                 } catch (e: Exception) {
-                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
+                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString(e.message ?: "Unknown error")))
                 }
             }
         }
@@ -234,7 +230,7 @@ class CalculatorViewModel @Inject constructor(
             _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
             _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.saved)))
         } catch (e: Exception) {
-            _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}")))
+            _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString(e.message ?: "Unknown error")))
         }
     }
 
@@ -272,11 +268,8 @@ class CalculatorViewModel @Inject constructor(
         _state.update { it.copy(costBreakdown = breakdown) }
     }
 
-    private suspend fun saveToHistory() {
+    private suspend fun saveToHistory(categoryName: String, routeFromFallback: String) {
         val currentState = _state.value
-        val categoryName = currentState.selectedUserVehicle?.name 
-            ?: currentState.selectedCategory?.label?.asString(context) 
-            ?: return
         val breakdown = currentState.costBreakdown ?: return
 
         if (currentState.routeTo.isBlank() || parseSafeDouble(currentState.distance) <= 0.0) {
@@ -289,7 +282,7 @@ class CalculatorViewModel @Inject constructor(
         try {
             val calculation = DeliveryCalculation(
                 categoryName = categoryName,
-                routeFrom = currentState.routeFrom.ifBlank { context.getString(R.string.not_specified) },
+                routeFrom = currentState.routeFrom.ifBlank { routeFromFallback },
                 routeTo = currentState.routeTo,
                 fuelType = currentState.fuelType,
                 deliveryDate = currentState.deliveryDate,
@@ -324,14 +317,14 @@ class CalculatorViewModel @Inject constructor(
             }
 
             _effects.emit(CalculatorUiEffect(
-                    showMessage = UiText.DynamicString("${context.getString(R.string.saved)}: ${currentState.routeFrom} → ${currentState.routeTo}")
+                    showMessage = UiText.StringResource(R.string.saved)
                 )
             )
             _state.update { it.copy(showSuccessMessage = true, isSaving = false) }
         } catch (e: Exception) {
             _state.update { it.copy(isSaving = false, error = e.message) }
             _effects.emit(CalculatorUiEffect(
-                showMessage = UiText.DynamicString("${context.getString(R.string.error)}: ${e.message}"))
+                showMessage = UiText.DynamicString(e.message ?: "Unknown error"))
             )
         }
     }

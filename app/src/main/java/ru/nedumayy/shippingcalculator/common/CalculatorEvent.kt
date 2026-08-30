@@ -31,7 +31,7 @@ sealed class CalculatorEvent {
     data class AnnualMileageChanged(val value: String) : CalculatorEvent()
     data class MaintenancePerKmChanged(val value: String) : CalculatorEvent()
 
-    data object SaveToHistory : CalculatorEvent()
+    data class SaveToHistory(val categoryName: String, val routeFromFallback: String) : CalculatorEvent()
     data class DeleteFromHistory(val id: Long) : CalculatorEvent()
 
     data class UserVehicleSelected(val vehicle: UserVehicle?) : CalculatorEvent()

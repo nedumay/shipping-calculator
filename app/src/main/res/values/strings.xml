@@ -30,7 +30,9 @@
     <string name="distance">Distance, km</string>
     <string name="fuel">Fuel</string>
     <string name="fuel_consumption">Fuel consumption, L/100 km</string>
+    <string name="fuel_consumption_electric">Consumption, kWh/100 km</string>
     <string name="price_per_liter">Price, ₽/L</string>
+    <string name="price_per_kwh">Price, ₽/kWh</string>
     <string name="fuel_type_petrol">Petrol</string>
     <string name="fuel_type_diesel">Diesel</string>
     <string name="fuel_type_gas">Gas</string>
@@ -91,6 +93,7 @@
     <string name="vehicle_profile">Vehicle Profile</string>
     <string name="fuel_type">Fuel type</string>
     <string name="fuel_price_label">Fuel price (₽/L)</string>
+    <string name="fuel_price_electric_label">Electricity price (₽/kWh)</string>
     <string name="insurance_per_km_label">Insurance (₽/km)</string>
     <string name="tax_per_km_label">Tax (₽/km)</string>
     <string name="tco_label">Total cost per km (TCO)</string>
