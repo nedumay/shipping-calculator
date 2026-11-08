@@ -10,6 +10,7 @@
 package ru.nedumayy.shippingcalculator.data.db.model
 
 import androidx.room.Entity
+import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "user_vehicles")
@@ -28,5 +29,7 @@ data class UserVehicleEntity(
     val annualMileage: Double,
     val hasFuel: Boolean,
     val extraExpenses: Double,
-    val marginPercent: Double
+    val marginPercent: Double,
+    @ColumnInfo(defaultValue = "0.0")
+    val residualValue: Double = 0.0
 )

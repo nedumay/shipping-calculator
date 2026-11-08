@@ -42,6 +42,7 @@ import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.common.formatMoney
+import ru.nedumayy.shippingcalculator.common.FuelType
 import ru.nedumayy.shippingcalculator.common.parseDate
 import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
@@ -184,7 +185,7 @@ fun CalculatorScreen(
                     value = state.routeFrom,
                     onValueChange = { viewModel.onEvent(CalculatorEvent.RouteFromChanged(it)) },
                     label = { Text(stringResource(R.string.where_from)) },
-                    placeholder = { Text("Город А", fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) },
+                    placeholder = { Text(stringResource(R.string.city_a), fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -194,7 +195,7 @@ fun CalculatorScreen(
                     value = state.routeTo,
                     onValueChange = { viewModel.onEvent(CalculatorEvent.RouteToChanged(it)) },
                     label = { Text(stringResource(R.string.where_to)) },
-                    placeholder = { Text("Город Б", fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) },
+                    placeholder = { Text(stringResource(R.string.city_b), fontSize = 14.sp, color = MaterialTheme.colorScheme.outline) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -233,7 +234,7 @@ fun CalculatorScreen(
                 NumberField(
                     label = stringResource(R.string.distance),
                     value = state.distance,
-                    placeholder = "15",
+                    placeholder = stringResource(R.string.example_distance),
                     suffix = stringResource(R.string.km)
                 ) { viewModel.onEvent(CalculatorEvent.DistanceChanged(it)) }
             }
@@ -241,10 +242,10 @@ fun CalculatorScreen(
             AnimatedVisibility(visible = state.selectedCategory?.hasFuel != false) {
                 InputGroupCard(title = stringResource(R.string.fuel)) {
                     val fuelTypes = listOf(
-                        stringResource(R.string.fuel_type_petrol),
-                        stringResource(R.string.fuel_type_diesel),
-                        stringResource(R.string.fuel_type_gas),
-                        stringResource(R.string.fuel_type_electricity)
+                        FuelType.PETROL to R.string.fuel_type_petrol,
+                        FuelType.DIESEL to R.string.fuel_type_diesel,
+                        FuelType.GAS to R.string.fuel_type_gas,
+                        FuelType.ELECTRICITY to R.string.fuel_type_electricity
                     )
                     var fuelTypeExpanded by remember { mutableStateOf(false) }
 
@@ -256,7 +257,7 @@ fun CalculatorScreen(
                             .padding(bottom = 8.dp)
                     ) {
                         OutlinedTextField(
-                            value = state.fuelType,
+                            value = stringResource(FuelType.labelResource(state.fuelType)),
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(R.string.fuel_type)) },
@@ -270,9 +271,9 @@ fun CalculatorScreen(
                             expanded = fuelTypeExpanded,
                             onDismissRequest = { fuelTypeExpanded = false }
                         ) {
-                            fuelTypes.forEach { type ->
+                            fuelTypes.forEach { (type, labelRes) ->
                                 DropdownMenuItem(
-                                    text = { Text(type) },
+                                    text = { Text(stringResource(labelRes)) },
                                     onClick = {
                                         viewModel.onEvent(CalculatorEvent.FuelTypeChanged(type))
                                         fuelTypeExpanded = false
@@ -284,15 +285,15 @@ fun CalculatorScreen(
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        val isElectric = state.fuelType == stringResource(R.string.fuel_type_electricity)
+                        val isElectric = state.fuelType == FuelType.ELECTRICITY
                         NumberField(
                             label = stringResource(
                                 if (isElectric) R.string.fuel_consumption_electric 
                                 else R.string.fuel_consumption
                             ),
                             value = state.fuelConsumption,
-                            placeholder = state.selectedCategory?.fuelConsumption?.toString() ?: "0",
-                            suffix = if (isElectric) "кВт·ч/100" else "л/100",
+                            placeholder = state.selectedCategory?.fuelConsumption?.toString() ?: stringResource(R.string.zero),
+                            suffix = stringResource(if (isElectric) R.string.kwh_per_hundred_km_short else R.string.liters_per_hundred_km_short),
                             modifier = Modifier.weight(1f)
                         ) { viewModel.onEvent(CalculatorEvent.FuelConsumptionChanged(it)) }
                         NumberField(
@@ -301,8 +302,8 @@ fun CalculatorScreen(
                                 else R.string.price_per_liter
                             ),
                             value = state.fuelPrice,
-                            placeholder = "58",
-                            suffix = "₽",
+                            placeholder = stringResource(R.string.example_fuel_price),
+                            suffix = stringResource(R.string.ruble_sign),
                             modifier = Modifier.weight(1f)
                         ) { viewModel.onEvent(CalculatorEvent.FuelPriceChanged(it)) }
                     }
@@ -310,22 +311,35 @@ fun CalculatorScreen(
             }
 
             InputGroupCard(title = stringResource(R.string.depreciation)) {
+                Text(
+                    stringResource(R.string.vehicle_values_are_estimates),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     NumberField(
                         label = stringResource(R.string.vehicle_price),
                         value = state.vehiclePrice,
-                        placeholder = state.selectedCategory?.vehiclePrice?.toLong()?.toString() ?: "0",
-                        suffix = "₽",
+                        placeholder = state.selectedCategory?.vehiclePrice?.toLong()?.toString() ?: stringResource(R.string.zero),
+                        suffix = stringResource(R.string.ruble_sign),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.VehiclePriceChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.resource_mileage),
                         value = state.resourceMileage,
-                        placeholder = state.selectedCategory?.resourceMileage?.toLong()?.toString() ?: "0",
-                        suffix = "км",
+                        placeholder = state.selectedCategory?.resourceMileage?.toLong()?.toString() ?: stringResource(R.string.zero),
+                        suffix = stringResource(R.string.km),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.ResourceMileageChanged(it)) }
                 }
+                NumberField(
+                    label = stringResource(R.string.residual_value),
+                    value = state.residualValue,
+                    placeholder = stringResource(R.string.zero),
+                    suffix = stringResource(R.string.ruble_sign),
+                    modifier = Modifier.fillMaxWidth()
+                ) { viewModel.onEvent(CalculatorEvent.ResidualValueChanged(it)) }
             }
 
             InputGroupCard(title = stringResource(R.string.maintenance_and_insurance)) {
@@ -333,15 +347,15 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.annual_tax),
                         value = state.annualTax,
-                        placeholder = state.selectedCategory?.annualTax?.toLong()?.toString() ?: "0",
-                        suffix = "₽/г",
+                        placeholder = state.selectedCategory?.annualTax?.toLong()?.toString() ?: stringResource(R.string.zero),
+                        suffix = stringResource(R.string.rubles_per_year_short),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.AnnualTaxChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.annual_mileage),
                         value = state.annualMileage,
-                        placeholder = state.selectedCategory?.annualMileage?.toLong()?.toString() ?: "30000",
-                        suffix = "км/г",
+                        placeholder = state.selectedCategory?.annualMileage?.toLong()?.toString() ?: stringResource(R.string.example_annual_mileage),
+                        suffix = stringResource(R.string.km_per_year_short),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.AnnualMileageChanged(it)) }
                 }
@@ -349,15 +363,15 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.maintenance_per_km),
                         value = state.maintenancePerKm,
-                        placeholder = state.selectedCategory?.maintenancePerKm?.toString() ?: "0",
-                        suffix = "₽/км",
+                        placeholder = state.selectedCategory?.maintenancePerKm?.toString() ?: stringResource(R.string.zero),
+                        suffix = stringResource(R.string.rubles_per_km_short),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.MaintenancePerKmChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.annual_insurance),
                         value = state.annualInsurance,
-                        placeholder = state.selectedCategory?.annualInsurance?.toLong()?.toString() ?: "0",
-                        suffix = "₽/г",
+                        placeholder = state.selectedCategory?.annualInsurance?.toLong()?.toString() ?: stringResource(R.string.zero),
+                        suffix = stringResource(R.string.rubles_per_year_short),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.AnnualInsuranceChanged(it)) }
                 }
@@ -368,15 +382,15 @@ fun CalculatorScreen(
                     NumberField(
                         label = stringResource(R.string.extra_expenses),
                         value = state.extraExpenses,
-                        placeholder = "150",
-                        suffix = "₽",
+                        placeholder = stringResource(R.string.example_extra_expenses),
+                        suffix = stringResource(R.string.ruble_sign),
                         modifier = Modifier.weight(1f)
                     ) { viewModel.onEvent(CalculatorEvent.ExtraExpensesChanged(it)) }
                     NumberField(
                         label = stringResource(R.string.margin),
                         value = state.marginPercent,
-                        placeholder = "20",
-                        suffix = "%",
+                        placeholder = stringResource(R.string.example_margin),
+                        suffix = stringResource(R.string.percent_sign),
                         modifier = Modifier.weight(1f),
                         imeAction = ImeAction.Done
                     ) { viewModel.onEvent(CalculatorEvent.MarginChanged(it)) }
@@ -384,6 +398,15 @@ fun CalculatorScreen(
             }
 
             Spacer(Modifier.height(24.dp))
+
+            state.calculationError?.let { error ->
+                Text(
+                    text = error.asString(),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
 
             val categoryName = state.selectedUserVehicle?.name 
                 ?: state.selectedCategory?.label?.asString(context) 
@@ -565,7 +588,7 @@ private fun ResultCard(
             ResultRow(stringResource(R.string.maintenance_and_repair), breakdown.maintenanceTotal)
             ResultRow(stringResource(R.string.insurance), breakdown.insuranceTotal)
             ResultRow(stringResource(R.string.extra_costs), breakdown.extraTotal)
-            ResultRow("${stringResource(R.string.margin_label)} (${state.marginPercent}%)", breakdown.marginAmount)
+            ResultRow(stringResource(R.string.margin_with_percent, state.marginPercent), breakdown.marginAmount)
             
             HorizontalDivider(Modifier.padding(vertical = 12.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
             
@@ -576,11 +599,11 @@ private fun ResultCard(
             ) {
                 Column {
                     Text(stringResource(R.string.price_per_km), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(formatMoney(breakdown.finalPerKm) + " ₽ / " + stringResource(R.string.km), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.money_per_km, formatMoney(breakdown.finalPerKm)), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(stringResource(R.string.total), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("${formatMoney(breakdown.finalTotal)} ₽", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.money_amount, formatMoney(breakdown.finalTotal)), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -596,7 +619,7 @@ private fun ResultRow(label: String, value: Double) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text("${formatMoney(value)} ₽", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        Text(stringResource(R.string.money_amount, formatMoney(value)), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -657,7 +680,7 @@ fun DatePickerDialogComponent(
                 }
                 onDismiss()
             }) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {

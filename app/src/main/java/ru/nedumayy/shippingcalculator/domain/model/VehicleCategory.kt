@@ -16,6 +16,7 @@ data class VehicleCategory(
     val label: UiText,
     val fuelConsumption: Double,
     val vehiclePrice: Double,
+    val residualValue: Double,
     val resourceMileage: Double,
     val annualTax: Double,
     val annualInsurance: Double,

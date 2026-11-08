@@ -9,7 +9,6 @@
 
 package ru.nedumayy.shippingcalculator.domain.model.ui
 
-import ru.nedumayy.shippingcalculator.common.parseSafeDouble
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
@@ -25,13 +24,14 @@ data class CalculatorUiState(
     val routeTo: String = "",
     val deliveryDate: String = LocalDate.now().toString(),
     val distance: String = "",
-    val fuelType: String = "Бензин",
+    val fuelType: String = "petrol",
     val fuelPrice: String = "",
     val extraExpenses: String = "",
     val marginPercent: String = "",
 
     val fuelConsumption: String = "",
     val vehiclePrice: String = "",
+    val residualValue: String = "",
     val resourceMileage: String = "",
     val annualTax: String = "",
     val annualInsurance: String = "",
@@ -39,6 +39,7 @@ data class CalculatorUiState(
     val maintenancePerKm: String = "",
 
     val costBreakdown: CostBreakdown? = null,
+    val calculationError: ru.nedumayy.shippingcalculator.common.UiText? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
     val showSuccessMessage: Boolean = false,
@@ -49,6 +50,6 @@ data class CalculatorUiState(
     val canSave: Boolean
         get() = (selectedCategory != null || selectedUserVehicle != null) &&
                 routeTo.isNotBlank() &&
-                parseSafeDouble(distance) > 0 &&
-                costBreakdown != null
+                costBreakdown != null &&
+                calculationError == null
 }

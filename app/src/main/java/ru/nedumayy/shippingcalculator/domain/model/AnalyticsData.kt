@@ -14,6 +14,6 @@ data class AnalyticsData(
     val totalExpenses: Double = 0.0,
     val netProfit: Double = 0.0,
     val averageCostPerKm: Double = 0.0,
-    val mostProfitableCategory: String = "-",
+    val mostProfitableCategory: String = "",
     val categoryStats: List<CategoryStat> = emptyList()
 )

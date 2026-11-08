@@ -22,12 +22,27 @@ class CalculateDeliveryCostUseCase @Inject constructor() {
         extraExpenses: Double,
         marginPercent: Double
     ): CostBreakdown {
+        require(distance.isFinite() && distance > 0.0) { "distance must be a finite positive value" }
+        require(fuelPrice.isFinite() && fuelPrice >= 0.0) { "fuelPrice must be a finite non-negative value" }
+        require(extraExpenses.isFinite() && extraExpenses >= 0.0) { "extraExpenses must be a finite non-negative value" }
+        require(marginPercent.isFinite() && marginPercent >= 0.0) { "marginPercent must be a finite non-negative value" }
+        require(category.annualMileage.isFinite() && category.annualMileage > 0.0) { "annualMileage must be positive" }
+        require(category.fuelConsumption.isFinite() && category.fuelConsumption >= 0.0) { "fuelConsumption must be non-negative" }
+        require(category.vehiclePrice.isFinite() && category.vehiclePrice >= 0.0) { "vehiclePrice must be non-negative" }
+        require(category.residualValue.isFinite() && category.residualValue >= 0.0 && category.residualValue <= category.vehiclePrice) {
+            "residualValue must be between zero and vehiclePrice"
+        }
+        require(category.resourceMileage.isFinite() && category.resourceMileage > 0.0) { "resourceMileage must be positive" }
+        require(category.annualTax.isFinite() && category.annualTax >= 0.0) { "annualTax must be non-negative" }
+        require(category.annualInsurance.isFinite() && category.annualInsurance >= 0.0) { "annualInsurance must be non-negative" }
+        require(category.maintenancePerKm.isFinite() && category.maintenancePerKm >= 0.0) { "maintenancePerKm must be non-negative" }
+
         val fuelPerKm = if (category.hasFuel) {
             (category.fuelConsumption / 100.0) * fuelPrice
         } else 0.0
 
         val depreciationPerKm = if (category.resourceMileage > 0) {
-            category.vehiclePrice / category.resourceMileage
+            (category.vehiclePrice - category.residualValue) / category.resourceMileage
         } else 0.0
 
         val taxPerKm = category.taxPerKm

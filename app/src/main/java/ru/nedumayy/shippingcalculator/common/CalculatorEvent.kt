@@ -25,6 +25,7 @@ sealed class CalculatorEvent {
 
     data class FuelConsumptionChanged(val value: String) : CalculatorEvent()
     data class VehiclePriceChanged(val value: String) : CalculatorEvent()
+    data class ResidualValueChanged(val value: String) : CalculatorEvent()
     data class ResourceMileageChanged(val value: String) : CalculatorEvent()
     data class AnnualTaxChanged(val value: String) : CalculatorEvent()
     data class AnnualInsuranceChanged(val value: String) : CalculatorEvent()

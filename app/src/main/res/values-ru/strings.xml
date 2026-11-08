@@ -62,6 +62,38 @@
     <string name="total">ИТОГО</string>
     <string name="cost_structure">Структура стоимости</string>
     <string name="km">км</string>
+    <string name="city_a">Город А</string>
+    <string name="city_b">Город Б</string>
+    <string name="example_distance">15</string>
+    <string name="example_fuel_price">58</string>
+    <string name="example_annual_mileage">30000</string>
+    <string name="example_extra_expenses">150</string>
+    <string name="example_margin">20</string>
+    <string name="zero">0</string>
+    <string name="ruble_sign">₽</string>
+    <string name="percent_sign">%</string>
+    <string name="liters_per_hundred_km_short">л/100</string>
+    <string name="kwh_per_hundred_km_short">кВт·ч/100</string>
+    <string name="rubles_per_year_short">₽/год</string>
+    <string name="km_per_year_short">км/год</string>
+    <string name="rubles_per_km_short">₽/км</string>
+    <string name="money_amount">%1$s ₽</string>
+    <string name="money_per_km">%1$s ₽ / км</string>
+    <string name="residual_value">Остаточная стоимость, ₽</string>
+    <string name="select_transport">Выберите тип транспорта</string>
+    <string name="invalid_numeric_input">Заполните числовые поля корректными значениями</string>
+    <string name="distance_must_be_positive">Расстояние должно быть больше нуля</string>
+    <string name="annual_mileage_must_be_positive">Годовой пробег должен быть больше нуля</string>
+    <string name="resource_mileage_must_be_positive">Ресурс транспорта должен быть больше нуля</string>
+    <string name="values_must_be_non_negative">Расходы и наценка не могут быть отрицательными</string>
+    <string name="residual_value_too_high">Остаточная стоимость не может быть выше стоимости транспорта</string>
+    <string name="generic_error">Произошла ошибка. Попробуйте ещё раз.</string>
+    <string name="ok">ОК</string>
+    <string name="invalid_profile_values">Проверьте данные транспорта: пробег и ресурс должны быть больше нуля, остальные значения — неотрицательными.</string>
+    <string name="expand_more">Развернуть</string>
+    <string name="vehicle_values_are_estimates">Предзаполненные значения примерные. Укажите фактические данные своего транспорта.</string>
+    <string name="margin_with_percent">Наценка (%1$s%%)</string>
+    <string name="tco_value">%1$s ₽/км</string>
 
     <!-- History Strings -->
     <string name="calculation_history">История расчетов</string>
@@ -81,7 +113,12 @@
     <string name="most_profitable">Самая прибыльная категория</string>
     <string name="by_category">Прибыль по категориям</string>
     <string name="no_data">Нет данных для анализа</string>
-    <string name="orders_count">заказов</string>
+    <plurals name="orders_count">
+        <item quantity="one">%d заказ</item>
+        <item quantity="few">%d заказа</item>
+        <item quantity="many">%d заказов</item>
+        <item quantity="other">%d заказа</item>
+    </plurals>
 
     <!-- Screen Titles -->
     <string name="screen_calculator">Расчет</string>

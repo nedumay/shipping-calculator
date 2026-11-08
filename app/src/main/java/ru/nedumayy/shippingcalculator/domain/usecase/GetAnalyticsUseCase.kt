@@ -42,7 +42,7 @@ class GetAnalyticsUseCase @Inject constructor(
                 }
                 .sortedByDescending { it.profit }
 
-            val mostProfitable = categoryStats.firstOrNull()?.categoryName ?: "-"
+            val mostProfitable = categoryStats.firstOrNull()?.categoryName.orEmpty()
 
             AnalyticsData(
                 totalRevenue = totalRevenue,
