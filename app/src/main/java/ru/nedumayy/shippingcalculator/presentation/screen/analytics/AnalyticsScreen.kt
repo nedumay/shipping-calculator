@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -97,12 +98,12 @@ fun AnalyticsScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         AnalyticsCard(
                             label = stringResource(R.string.avg_cost_km),
-                            value = "${formatMoney(state.averageCostPerKm)}/км",
+                            value = stringResource(R.string.money_per_km, formatMoney(state.averageCostPerKm)),
                             modifier = Modifier.weight(1f)
                         )
                         AnalyticsCard(
                             label = stringResource(R.string.most_profitable),
-                            value = state.mostProfitableCategory,
+                            value = state.mostProfitableCategory.ifBlank { stringResource(R.string.not_specified) },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -163,7 +164,7 @@ fun CategoryStatRow(name: String, profit: Double, count: Int) {
             Column {
                 Text(name, fontWeight = FontWeight.Medium)
                 Text(
-                    "$count ${stringResource(R.string.orders_count)}",
+                    pluralStringResource(R.plurals.orders_count, count, count),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )

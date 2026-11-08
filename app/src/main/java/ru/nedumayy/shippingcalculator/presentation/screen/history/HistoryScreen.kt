@@ -183,7 +183,7 @@ fun HistoryItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${formatMoney(calculation.totalCost)} ₽",
+                        text = stringResource(R.string.money_amount, formatMoney(calculation.totalCost)),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.primary
@@ -207,13 +207,13 @@ fun HistoryItem(
                     Spacer(Modifier.height(12.dp))
                     
                     DetailRow(stringResource(R.string.distance), "${calculation.distance} ${stringResource(R.string.km)}")
-                    DetailRow(stringResource(R.string.fuel), "${formatMoney(calculation.fuelCost)} ₽")
-                    DetailRow(stringResource(R.string.depreciation), "${formatMoney(calculation.depreciationCost)} ₽")
-                    DetailRow(stringResource(R.string.maintenance_and_repair), "${formatMoney(calculation.maintenanceCost)} ₽")
-                    DetailRow(stringResource(R.string.extra_costs), "${formatMoney(calculation.extraExpenses)} ₽")
+                    DetailRow(stringResource(R.string.fuel), stringResource(R.string.money_amount, formatMoney(calculation.fuelCost)))
+                    DetailRow(stringResource(R.string.depreciation), stringResource(R.string.money_amount, formatMoney(calculation.depreciationCost)))
+                    DetailRow(stringResource(R.string.maintenance_and_repair), stringResource(R.string.money_amount, formatMoney(calculation.maintenanceCost)))
+                    DetailRow(stringResource(R.string.extra_costs), stringResource(R.string.money_amount, formatMoney(calculation.extraExpenses)))
                     
                     val marginAmount = calculation.totalCost - (calculation.fuelCost + calculation.depreciationCost + calculation.maintenanceCost + calculation.taxCost + calculation.insuranceCost + calculation.extraExpenses)
-                    DetailRow(stringResource(R.string.margin_label), "${formatMoney(marginAmount)} ₽")
+                    DetailRow(stringResource(R.string.margin_label), stringResource(R.string.money_amount, formatMoney(marginAmount)))
                     
                     Spacer(Modifier.height(12.dp))
                     Row(
@@ -228,7 +228,7 @@ fun HistoryItem(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "${formatMoney(calculation.costPerKm)} ₽/${stringResource(R.string.km)}",
+                            text = stringResource(R.string.money_per_km, formatMoney(calculation.costPerKm)),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary

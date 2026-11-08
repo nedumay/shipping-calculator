@@ -14,7 +14,7 @@ data class DeliveryCalculation(
     val categoryName: String,
     val routeFrom: String,
     val routeTo: String,
-    val fuelType: String = "Бензин",
+    val fuelType: String = "petrol",
     val deliveryDate: String,
     val distance: Double,
     val fuelCost: Double,

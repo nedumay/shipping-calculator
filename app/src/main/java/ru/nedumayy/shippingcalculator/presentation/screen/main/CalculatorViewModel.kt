@@ -24,9 +24,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
+import ru.nedumayy.shippingcalculator.common.FuelType
 import ru.nedumayy.shippingcalculator.common.UiText
 import ru.nedumayy.shippingcalculator.common.formatDate
-import ru.nedumayy.shippingcalculator.common.parseSafeDouble
 import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiEffect
 import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
@@ -60,10 +60,10 @@ class CalculatorViewModel @Inject constructor(
 
     private fun loadCategories() {
         val categories = listOf(
-            VehicleCategory("moped", UiText.StringResource(R.string.moped), 3.0, 120_000.0, 50_000.0, 1000.0, 2500.0, 5000.0, 1.5, true),
-            VehicleCategory("car", UiText.StringResource(R.string.car), 8.5, 1_800_000.0, 250_000.0, 10000.0, 30000.0, 25000.0, 3.5, true),
-            VehicleCategory("van", UiText.StringResource(R.string.van), 13.0, 3_500_000.0, 400_000.0, 30000.0, 75000.0, 30000.0, 6.0, true),
-            VehicleCategory("truck", UiText.StringResource(R.string.truck), 28.0, 10_000_000.0, 800_000.0, 100000.0, 250000.0, 50000.0, 15.0, true)
+            VehicleCategory("moped", UiText.StringResource(R.string.moped), 3.0, 120_000.0, 0.0, 50_000.0, 1000.0, 2500.0, 5000.0, 1.5, true),
+            VehicleCategory("car", UiText.StringResource(R.string.car), 8.5, 1_800_000.0, 0.0, 250_000.0, 10000.0, 30000.0, 25000.0, 3.5, true),
+            VehicleCategory("van", UiText.StringResource(R.string.van), 13.0, 3_500_000.0, 0.0, 400_000.0, 30000.0, 75000.0, 30000.0, 6.0, true),
+            VehicleCategory("truck", UiText.StringResource(R.string.truck), 28.0, 10_000_000.0, 0.0, 800_000.0, 100000.0, 250000.0, 50000.0, 15.0, true)
         )
         val defaultCategory = categories[1]
         _state.update {
@@ -96,8 +96,10 @@ class CalculatorViewModel @Inject constructor(
                     it.copy(
                         selectedCategory = event.category,
                         selectedUserVehicle = null,
+                        fuelType = FuelType.PETROL,
                         fuelConsumption = "",
                         vehiclePrice = "",
+                        residualValue = "",
                         resourceMileage = "",
                         annualTax = "",
                         annualInsurance = "",
@@ -138,6 +140,10 @@ class CalculatorViewModel @Inject constructor(
                 _state.update { it.copy(vehiclePrice = event.value) }
                 calculateCost()
             }
+            is CalculatorEvent.ResidualValueChanged -> {
+                _state.update { it.copy(residualValue = event.value) }
+                calculateCost()
+            }
             is CalculatorEvent.ResourceMileageChanged -> {
                 _state.update { it.copy(resourceMileage = event.value) }
                 calculateCost()
@@ -162,8 +168,8 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorEvent.DeleteFromHistory -> {
                 try {
                     calculationRepository.deleteCalculation(event.id)
-                } catch (e: Exception) {
-                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString(e.message ?: "Unknown error")))
+                } catch (_: Exception) {
+                    _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.generic_error)))
                 }
             }
             
@@ -176,14 +182,15 @@ class CalculatorViewModel @Inject constructor(
                             fuelType = vehicle.fuelType,
                             fuelConsumption = vehicle.fuelConsumption.toString(),
                             vehiclePrice = vehicle.vehiclePrice.toString(),
+                            residualValue = vehicle.residualValue.toString(),
                             resourceMileage = vehicle.resourceMileage.toString(),
                             annualTax = vehicle.annualTax.toString(),
                             annualInsurance = vehicle.annualInsurance.toString(),
                             annualMileage = vehicle.annualMileage.toString(),
                             maintenancePerKm = vehicle.maintenancePerKm.toString(),
-                            fuelPrice = if (vehicle.fuelPrice > 0) vehicle.fuelPrice.toString() else it.fuelPrice,
-                            extraExpenses = if (vehicle.extraExpenses > 0) vehicle.extraExpenses.toString() else it.extraExpenses,
-                            marginPercent = if (vehicle.marginPercent > 0) vehicle.marginPercent.toString() else it.marginPercent
+                            fuelPrice = vehicle.fuelPrice.toString(),
+                            extraExpenses = vehicle.extraExpenses.toString(),
+                            marginPercent = vehicle.marginPercent.toString()
                         )
                     }
                 } ?: run {
@@ -198,8 +205,8 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorEvent.DeleteUserVehicle -> {
                 try {
                     vehicleRepository.deleteUserVehicle(event.vehicle)
-                } catch (e: Exception) {
-                    _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString(e.message ?: "Unknown error")))
+                } catch (_: Exception) {
+                    _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.generic_error)))
                 }
             }
         }
@@ -209,70 +216,129 @@ class CalculatorViewModel @Inject constructor(
         val currentState = _state.value
         if (currentState.newVehicleName.isBlank()) return
 
+        val numericValues = listOf(
+            currentState.fuelConsumption,
+            currentState.vehiclePrice,
+            currentState.residualValue,
+            currentState.resourceMileage,
+            currentState.annualTax,
+            currentState.annualInsurance,
+            currentState.annualMileage,
+            currentState.maintenancePerKm,
+            currentState.fuelPrice,
+            currentState.extraExpenses,
+            currentState.marginPercent
+        ).map { parseFiniteDouble(it) }
+        if (numericValues.any { it == null } ||
+            numericValues.any { it!! < 0.0 } ||
+            numericValues[3]!! <= 0.0 || numericValues[6]!! <= 0.0 ||
+            numericValues[2]!! > numericValues[1]!!) {
+            _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.fill_required_fields)))
+            return
+        }
+
         try {
             val vehicle = UserVehicle(
                 name = currentState.newVehicleName,
                 fuelType = currentState.fuelType,
-                fuelConsumption = parseSafeDouble(currentState.fuelConsumption),
-                vehiclePrice = parseSafeDouble(currentState.vehiclePrice),
-                resourceMileage = parseSafeDouble(currentState.resourceMileage),
-                annualTax = parseSafeDouble(currentState.annualTax),
-                annualInsurance = parseSafeDouble(currentState.annualInsurance),
-                annualMileage = parseSafeDouble(currentState.annualMileage),
-                maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm),
+                fuelConsumption = numericValues[0]!!,
+                vehiclePrice = numericValues[1]!!,
+                residualValue = numericValues[2]!!,
+                resourceMileage = numericValues[3]!!,
+                annualTax = numericValues[4]!!,
+                annualInsurance = numericValues[5]!!,
+                annualMileage = numericValues[6]!!,
+                maintenancePerKm = numericValues[7]!!,
                 hasFuel = true,
-                fuelPrice = parseSafeDouble(currentState.fuelPrice),
-                extraExpenses = parseSafeDouble(currentState.extraExpenses),
-                marginPercent = parseSafeDouble(currentState.marginPercent)
+                fuelPrice = numericValues[8]!!,
+                extraExpenses = numericValues[9]!!,
+                marginPercent = numericValues[10]!!
             )
 
             vehicleRepository.insertUserVehicle(vehicle)
             _state.update { it.copy(showSaveVehicleDialog = false, newVehicleName = "") }
             _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.saved)))
-        } catch (e: Exception) {
-            _effects.emit(CalculatorUiEffect(showMessage = UiText.DynamicString(e.message ?: "Unknown error")))
+        } catch (_: Exception) {
+            _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.generic_error)))
         }
     }
 
     private fun calculateCost() {
         val currentState = _state.value
-        
-        val fuelConsumption = parseSafeDouble(currentState.fuelConsumption)
-        val vehiclePrice = parseSafeDouble(currentState.vehiclePrice)
-        val resourceMileage = parseSafeDouble(currentState.resourceMileage)
-        val annualTax = parseSafeDouble(currentState.annualTax)
-        val annualInsurance = parseSafeDouble(currentState.annualInsurance)
-        val annualMileage = parseSafeDouble(currentState.annualMileage)
-        val maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm)
 
-        val baseCategory = currentState.selectedCategory ?: currentState.categories.getOrNull(1) ?: return
+        val baseCategory = currentState.selectedCategory
+            ?: currentState.categories.getOrNull(1)
+            ?: run {
+                _state.update { it.copy(costBreakdown = null, calculationError = UiText.StringResource(R.string.select_transport)) }
+                return
+            }
+        val hasFuel = currentState.selectedUserVehicle?.hasFuel ?: baseCategory.hasFuel
+        val fuelConsumption = parseFiniteDouble(currentState.fuelConsumption)
+        val vehiclePrice = parseFiniteDouble(currentState.vehiclePrice)
+        val residualValue = parseFiniteDouble(currentState.residualValue)
+        val resourceMileage = parseFiniteDouble(currentState.resourceMileage)
+        val annualTax = parseFiniteDouble(currentState.annualTax)
+        val annualInsurance = parseFiniteDouble(currentState.annualInsurance)
+        val annualMileage = parseFiniteDouble(currentState.annualMileage)
+        val maintenancePerKm = parseFiniteDouble(currentState.maintenancePerKm)
+        val distance = parseFiniteDouble(currentState.distance)
+        val fuelPrice = parseFiniteDouble(currentState.fuelPrice)
+        val extraExpenses = parseFiniteDouble(currentState.extraExpenses)
+        val marginPercent = parseFiniteDouble(currentState.marginPercent)
+
+        val numbers = listOf(
+            fuelConsumption, vehiclePrice, residualValue, resourceMileage, annualTax,
+            annualInsurance, annualMileage, maintenancePerKm, distance, extraExpenses,
+            marginPercent
+        ) + if (hasFuel) listOf(fuelPrice) else emptyList()
+        val invalidMessage = when {
+            numbers.any { it == null } -> R.string.invalid_numeric_input
+            numbers.any { it!!.isFinite().not() } -> R.string.invalid_numeric_input
+            distance!! <= 0.0 -> R.string.distance_must_be_positive
+            annualMileage!! <= 0.0 -> R.string.annual_mileage_must_be_positive
+            resourceMileage!! <= 0.0 -> R.string.resource_mileage_must_be_positive
+            numbers.any { it!! < 0.0 } -> R.string.values_must_be_non_negative
+            residualValue!! > vehiclePrice!! -> R.string.residual_value_too_high
+            else -> null
+        }
+        if (invalidMessage != null) {
+            _state.update {
+                it.copy(costBreakdown = null, calculationError = UiText.StringResource(invalidMessage))
+            }
+            return
+        }
 
         val virtualCategory = baseCategory.copy(
-            fuelConsumption = fuelConsumption,
-            vehiclePrice = vehiclePrice,
-            resourceMileage = resourceMileage,
-            annualTax = annualTax,
-            annualInsurance = annualInsurance,
-            annualMileage = annualMileage,
-            maintenancePerKm = maintenancePerKm
+            hasFuel = hasFuel,
+            fuelConsumption = fuelConsumption!!,
+            vehiclePrice = vehiclePrice!!,
+            residualValue = residualValue!!,
+            resourceMileage = resourceMileage!!,
+            annualTax = annualTax!!,
+            annualInsurance = annualInsurance!!,
+            annualMileage = annualMileage!!,
+            maintenancePerKm = maintenancePerKm!!
         )
 
         val breakdown = calculateUseCase(
             category = virtualCategory,
-            distance = parseSafeDouble(currentState.distance),
-            fuelPrice = parseSafeDouble(currentState.fuelPrice),
-            extraExpenses = parseSafeDouble(currentState.extraExpenses),
-            marginPercent = parseSafeDouble(currentState.marginPercent)
+            distance = distance!!,
+            fuelPrice = if (hasFuel) fuelPrice!! else 0.0,
+            extraExpenses = extraExpenses!!,
+            marginPercent = marginPercent!!
         )
 
-        _state.update { it.copy(costBreakdown = breakdown) }
+        _state.update { it.copy(costBreakdown = breakdown, calculationError = null) }
     }
 
     private suspend fun saveToHistory(categoryName: String, routeFromFallback: String) {
+        calculateCost()
         val currentState = _state.value
         val breakdown = currentState.costBreakdown ?: return
 
-        if (currentState.routeTo.isBlank() || parseSafeDouble(currentState.distance) <= 0.0) {
+        val distance = parseFiniteDouble(currentState.distance)
+        val marginPercent = parseFiniteDouble(currentState.marginPercent)
+        if (currentState.routeTo.isBlank() || distance == null || marginPercent == null) {
             _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.fill_required_fields)))
             return
         }
@@ -286,14 +352,14 @@ class CalculatorViewModel @Inject constructor(
                 routeTo = currentState.routeTo,
                 fuelType = currentState.fuelType,
                 deliveryDate = currentState.deliveryDate,
-                distance = parseSafeDouble(currentState.distance),
+                distance = distance,
                 fuelCost = breakdown.fuelTotal,
                 depreciationCost = breakdown.depreciationTotal,
                 taxCost = breakdown.taxTotal,
                 maintenanceCost = breakdown.maintenanceTotal,
                 insuranceCost = breakdown.insuranceTotal,
                 extraExpenses = breakdown.extraTotal,
-                marginPercent = parseSafeDouble(currentState.marginPercent),
+                marginPercent = marginPercent,
                 totalCost = breakdown.finalTotal,
                 costPerKm = breakdown.finalPerKm
             )
@@ -302,16 +368,17 @@ class CalculatorViewModel @Inject constructor(
 
             currentState.selectedUserVehicle?.let { vehicle ->
                 val updatedVehicle = vehicle.copy(
-                    fuelConsumption = parseSafeDouble(currentState.fuelConsumption),
-                    vehiclePrice = parseSafeDouble(currentState.vehiclePrice),
-                    resourceMileage = parseSafeDouble(currentState.resourceMileage),
-                    annualTax = parseSafeDouble(currentState.annualTax),
-                    annualInsurance = parseSafeDouble(currentState.annualInsurance),
-                    annualMileage = parseSafeDouble(currentState.annualMileage),
-                    maintenancePerKm = parseSafeDouble(currentState.maintenancePerKm),
-                    fuelPrice = parseSafeDouble(currentState.fuelPrice),
-                    extraExpenses = parseSafeDouble(currentState.extraExpenses),
-                    marginPercent = parseSafeDouble(currentState.marginPercent)
+                    fuelConsumption = parseFiniteDouble(currentState.fuelConsumption) ?: vehicle.fuelConsumption,
+                    vehiclePrice = parseFiniteDouble(currentState.vehiclePrice) ?: vehicle.vehiclePrice,
+                    residualValue = parseFiniteDouble(currentState.residualValue) ?: vehicle.residualValue,
+                    resourceMileage = parseFiniteDouble(currentState.resourceMileage) ?: vehicle.resourceMileage,
+                    annualTax = parseFiniteDouble(currentState.annualTax) ?: vehicle.annualTax,
+                    annualInsurance = parseFiniteDouble(currentState.annualInsurance) ?: vehicle.annualInsurance,
+                    annualMileage = parseFiniteDouble(currentState.annualMileage) ?: vehicle.annualMileage,
+                    maintenancePerKm = parseFiniteDouble(currentState.maintenancePerKm) ?: vehicle.maintenancePerKm,
+                    fuelPrice = parseFiniteDouble(currentState.fuelPrice) ?: vehicle.fuelPrice,
+                    extraExpenses = parseFiniteDouble(currentState.extraExpenses) ?: vehicle.extraExpenses,
+                    marginPercent = parseFiniteDouble(currentState.marginPercent) ?: vehicle.marginPercent
                 )
                 vehicleRepository.updateUserVehicle(updatedVehicle)
             }
@@ -321,11 +388,14 @@ class CalculatorViewModel @Inject constructor(
                 )
             )
             _state.update { it.copy(showSuccessMessage = true, isSaving = false) }
-        } catch (e: Exception) {
-            _state.update { it.copy(isSaving = false, error = e.message) }
+        } catch (_: Exception) {
+            _state.update { it.copy(isSaving = false, error = null) }
             _effects.emit(CalculatorUiEffect(
-                showMessage = UiText.DynamicString(e.message ?: "Unknown error"))
+                showMessage = UiText.StringResource(R.string.generic_error))
             )
         }
     }
 }
+
+private fun parseFiniteDouble(value: String): Double? =
+    value.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }

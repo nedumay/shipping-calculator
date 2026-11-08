@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.nedumayy.shippingcalculator.R
+import ru.nedumayy.shippingcalculator.common.FuelType
+import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceCategory
 import ru.nedumayy.shippingcalculator.domain.model.MaintenanceRecord
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
@@ -150,17 +153,30 @@ fun VehicleProfileTab(
     var consumption by remember(vehicle) { mutableStateOf(vehicle.fuelConsumption.toString()) }
     var fuelPrice by remember(vehicle) { mutableStateOf(vehicle.fuelPrice.toString()) }
     var vehiclePrice by remember(vehicle) { mutableStateOf(vehicle.vehiclePrice.toString()) }
+    var residualValue by remember(vehicle) { mutableStateOf(vehicle.residualValue.toString()) }
     var resource by remember(vehicle) { mutableStateOf(vehicle.resourceMileage.toString()) }
     var maintenance by remember(vehicle) { mutableStateOf(vehicle.maintenancePerKm.toString()) }
     var annualInsurance by remember(vehicle) { mutableStateOf(vehicle.annualInsurance.toString()) }
     var annualTax by remember(vehicle) { mutableStateOf(vehicle.annualTax.toString()) }
     var annualMileage by remember(vehicle) { mutableStateOf(vehicle.annualMileage.toString()) }
 
+    fun parseFinite(value: String): Double? =
+        value.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }
+
+    val parsedValues = listOf(
+        consumption, fuelPrice, vehiclePrice, residualValue, resource, maintenance,
+        annualInsurance, annualTax, annualMileage
+    ).map(::parseFinite)
+    val profileValuesValid = parsedValues.all { it != null && it >= 0.0 } &&
+        (parsedValues[4] ?: 0.0) > 0.0 &&
+        (parsedValues[8] ?: 0.0) > 0.0 &&
+        (parsedValues[3] ?: 0.0) <= (parsedValues[2] ?: -1.0)
+
     val fuelTypes = listOf(
-        stringResource(R.string.fuel_type_petrol),
-        stringResource(R.string.fuel_type_diesel),
-        stringResource(R.string.fuel_type_gas),
-        stringResource(R.string.fuel_type_electricity)
+        FuelType.PETROL to R.string.fuel_type_petrol,
+        FuelType.DIESEL to R.string.fuel_type_diesel,
+        FuelType.GAS to R.string.fuel_type_gas,
+        FuelType.ELECTRICITY to R.string.fuel_type_electricity
     )
     var fuelTypeExpanded by remember { mutableStateOf(false) }
 
@@ -188,7 +204,7 @@ fun VehicleProfileTab(
                 modifier = Modifier.weight(1f)
             ) {
                 OutlinedTextField(
-                    value = fuelType,
+                    value = stringResource(FuelType.labelResource(fuelType)),
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.fuel_type)) },
@@ -200,9 +216,9 @@ fun VehicleProfileTab(
                     expanded = fuelTypeExpanded,
                     onDismissRequest = { fuelTypeExpanded = false }
                 ) {
-                    fuelTypes.forEach { type ->
+                    fuelTypes.forEach { (type, labelRes) ->
                         DropdownMenuItem(
-                            text = { Text(type) },
+                            text = { Text(stringResource(labelRes)) },
                             onClick = {
                                 fuelType = type
                                 fuelTypeExpanded = false
@@ -212,7 +228,7 @@ fun VehicleProfileTab(
                     }
                 }
             }
-            val isElectric = fuelType == stringResource(R.string.fuel_type_electricity)
+            val isElectric = fuelType == FuelType.ELECTRICITY
             OutlinedTextField(
                 value = consumption,
                 onValueChange = { consumption = it },
@@ -229,7 +245,7 @@ fun VehicleProfileTab(
             )
         }
 
-        val isElectric = fuelType == stringResource(R.string.fuel_type_electricity)
+        val isElectric = fuelType == FuelType.ELECTRICITY
 
         OutlinedTextField(
             value = fuelPrice,
@@ -267,7 +283,16 @@ fun VehicleProfileTab(
             value = maintenance,
             onValueChange = { maintenance = it },
             label = { Text(stringResource(R.string.maintenance_per_km)) },
-            suffix = { Text("₽/км") },
+            suffix = { Text(stringResource(R.string.rubles_per_km_short)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = residualValue,
+            onValueChange = { residualValue = it },
+            label = { Text(stringResource(R.string.residual_value)) },
+            suffix = { Text(stringResource(R.string.ruble_sign)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth()
         )
@@ -277,7 +302,7 @@ fun VehicleProfileTab(
                 value = annualTax,
                 onValueChange = { annualTax = it },
                 label = { Text(stringResource(R.string.annual_tax)) },
-                suffix = { Text("₽/г") },
+                suffix = { Text(stringResource(R.string.rubles_per_year_short)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.weight(1f)
             )
@@ -285,7 +310,7 @@ fun VehicleProfileTab(
                 value = annualMileage,
                 onValueChange = { annualMileage = it },
                 label = { Text(stringResource(R.string.annual_mileage)) },
-                suffix = { Text("км/г") },
+                suffix = { Text(stringResource(R.string.km_per_year_short)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.weight(1f)
             )
@@ -295,7 +320,7 @@ fun VehicleProfileTab(
             value = annualInsurance,
             onValueChange = { annualInsurance = it },
             label = { Text(stringResource(R.string.annual_insurance)) },
-            suffix = { Text("₽/г") },
+            suffix = { Text(stringResource(R.string.rubles_per_year_short)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth()
         )
@@ -306,27 +331,35 @@ fun VehicleProfileTab(
                     vehicle.copy(
                         name = name,
                         fuelType = fuelType,
-                        fuelConsumption = consumption.toDoubleOrNull() ?: 0.0,
-                        fuelPrice = fuelPrice.toDoubleOrNull() ?: 0.0,
-                        vehiclePrice = vehiclePrice.toDoubleOrNull() ?: 0.0,
-                        resourceMileage = resource.toDoubleOrNull() ?: 0.0,
-                        maintenancePerKm = maintenance.toDoubleOrNull() ?: 0.0,
-                        annualTax = annualTax.toDoubleOrNull() ?: 0.0,
-                        annualInsurance = annualInsurance.toDoubleOrNull() ?: 0.0,
-                        annualMileage = annualMileage.toDoubleOrNull() ?: 0.0
+                        fuelConsumption = parsedValues[0]!!,
+                        fuelPrice = parsedValues[1]!!,
+                        vehiclePrice = parsedValues[2]!!,
+                        residualValue = parsedValues[3]!!,
+                        resourceMileage = parsedValues[4]!!,
+                        maintenancePerKm = parsedValues[5]!!,
+                        annualInsurance = parsedValues[6]!!,
+                        annualTax = parsedValues[7]!!,
+                        annualMileage = parsedValues[8]!!
                     )
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
-            enabled = !isSaving
+            enabled = !isSaving && profileValuesValid
         ) {
             if (isSaving) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
             } else {
                 Text(stringResource(R.string.save_profile))
             }
+        }
+        if (!profileValuesValid) {
+            Text(
+                stringResource(R.string.invalid_profile_values),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
         
         Spacer(Modifier.height(Screen.BottomPadding))
@@ -348,7 +381,7 @@ fun TcoCard(totalCost: Double) {
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = String.format(Locale.getDefault(), "%.2f ₽/км", totalCost),
+                text = stringResource(R.string.tco_value, formatMoney(totalCost)),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onPrimary
@@ -382,7 +415,7 @@ fun SummaryCard(totalRealCost: Double, totalEstimatedCost: Double, costDifferenc
                 Column {
                     Text(stringResource(R.string.total_costs), style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = String.format(Locale.getDefault(), "%.2f ₽", totalRealCost),
+                        text = stringResource(R.string.money_amount, formatMoney(totalRealCost)),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -390,7 +423,7 @@ fun SummaryCard(totalRealCost: Double, totalEstimatedCost: Double, costDifferenc
                 Column(horizontalAlignment = Alignment.End) {
                     Text(stringResource(R.string.estimated_costs_by_mileage), style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = String.format(Locale.getDefault(), "%.2f ₽", totalEstimatedCost),
+                        text = stringResource(R.string.money_amount, formatMoney(totalEstimatedCost)),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -460,7 +493,7 @@ fun VehicleSelector(
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                Text(text = "▼", fontSize = 12.sp)
+                Icon(Icons.Default.ExpandMore, contentDescription = stringResource(R.string.expand_more))
             }
         }
 
@@ -552,7 +585,7 @@ fun RecordItem(record: MaintenanceRecord, onDelete: (MaintenanceRecord) -> Unit)
             
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = String.format(Locale.getDefault(), "%.2f ₽", record.cost),
+                        text = stringResource(R.string.money_amount, formatMoney(record.cost)),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -616,6 +649,10 @@ fun AddMaintenanceDialog(
     var description by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf(MaintenanceCategory.SERVICE) }
+    val parsedMileage = mileage.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }
+    val parsedCost = cost.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }
+    val canConfirm = parsedMileage != null && parsedMileage >= 0.0 &&
+        parsedCost != null && parsedCost >= 0.0 && description.isNotBlank()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -676,12 +713,9 @@ fun AddMaintenanceDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val m = mileage.toDoubleOrNull() ?: 0.0
-                    val c = cost.toDoubleOrNull() ?: 0.0
-                    if (description.isNotEmpty()) {
-                        onConfirm(m, description, c, selectedCategory)
-                    }
-                }
+                    if (canConfirm) onConfirm(parsedMileage!!, description, parsedCost!!, selectedCategory)
+                },
+                enabled = canConfirm
             ) {
                 Text(stringResource(R.string.add))
             }

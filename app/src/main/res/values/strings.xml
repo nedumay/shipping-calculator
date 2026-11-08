@@ -61,6 +61,38 @@
     <string name="total">TOTAL</string>
     <string name="cost_structure">Cost structure</string>
     <string name="km">km</string>
+    <string name="city_a">City A</string>
+    <string name="city_b">City B</string>
+    <string name="example_distance">15</string>
+    <string name="example_fuel_price">58</string>
+    <string name="example_annual_mileage">30000</string>
+    <string name="example_extra_expenses">150</string>
+    <string name="example_margin">20</string>
+    <string name="zero">0</string>
+    <string name="ruble_sign">₽</string>
+    <string name="percent_sign">%</string>
+    <string name="liters_per_hundred_km_short">L/100</string>
+    <string name="kwh_per_hundred_km_short">kWh/100</string>
+    <string name="rubles_per_year_short">₽/year</string>
+    <string name="km_per_year_short">km/year</string>
+    <string name="rubles_per_km_short">₽/km</string>
+    <string name="money_amount">%1$s ₽</string>
+    <string name="money_per_km">%1$s ₽ / km</string>
+    <string name="residual_value">Residual value, ₽</string>
+    <string name="select_transport">Select a vehicle type</string>
+    <string name="invalid_numeric_input">Enter valid numbers in all calculation fields</string>
+    <string name="distance_must_be_positive">Distance must be greater than zero</string>
+    <string name="annual_mileage_must_be_positive">Annual mileage must be greater than zero</string>
+    <string name="resource_mileage_must_be_positive">Vehicle resource must be greater than zero</string>
+    <string name="values_must_be_non_negative">Costs and margin cannot be negative</string>
+    <string name="residual_value_too_high">Residual value cannot exceed vehicle price</string>
+    <string name="generic_error">Something went wrong. Please try again.</string>
+    <string name="ok">OK</string>
+    <string name="invalid_profile_values">Check vehicle values. Mileage and resource must be above zero; other values cannot be negative.</string>
+    <string name="expand_more">Expand</string>
+    <string name="vehicle_values_are_estimates">Pre-filled vehicle values are estimates. Replace them with your actual vehicle data.</string>
+    <string name="margin_with_percent">Margin (%1$s%%)</string>
+    <string name="tco_value">%1$s ₽/km</string>
 
     <!-- History Strings -->
     <string name="calculation_history">Calculation history</string>
@@ -80,7 +112,10 @@
     <string name="most_profitable">Most profitable category</string>
     <string name="by_category">Profit by category</string>
     <string name="no_data">No data for analytics</string>
-    <string name="orders_count">orders</string>
+    <plurals name="orders_count">
+        <item quantity="one">%d order</item>
+        <item quantity="other">%d orders</item>
+    </plurals>
 
     <!-- Screen Titles -->
     <string name="screen_calculator">Calculator</string>
