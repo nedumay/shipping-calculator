@@ -36,6 +36,8 @@ Individual users or small businesses who require a simple, local tool to estimat
 | **F004** | Calculation History | Save and retrieve historical delivery calculation results for later review. | Complete |
 | **F005** | User Settings Management | Manage application-wide settings such as preferred fuel types or calculation preferences. | Complete |
 | **F006** | Usage Analytics | Track and display statistics related to application usage and calculated data. | Complete |
+| **F007** | Calculation Modes | Switch between Simple and Advanced calculation UI modes. | Complete |
+| **F008** | Share Delivery Quote | Export and share formatted delivery cost receipts/commercial offers via Telegram, WhatsApp, or PDF. | Complete |
 
 ## 4. Constraints and Risks
 

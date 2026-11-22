@@ -21,6 +21,16 @@
     <string name="calculation_mode">Режим расчета</string>
     <string name="mode_simple">Простой</string>
     <string name="mode_advanced">Расширенный</string>
+    <string name="share_quote">Поделиться сметой</string>
+    <string name="share_quote_title">Расчёт стоимости доставки</string>
+    <string name="quote_header">🚚 Расчёт стоимости доставки</string>
+    <string name="quote_route">📍 Маршрут: %1$s → %2$s</string>
+    <string name="quote_distance">📏 Расстояние: %1$s км</string>
+    <string name="quote_date">📅 Дата доставки: %1$s</string>
+    <string name="quote_vehicle">🚗 Транспорт: %1$s</string>
+    <string name="quote_total">💰 Итоговая стоимость: %1$s ₽</string>
+    <string name="quote_rate">(Тариф: %1$s ₽/км)</string>
+    <string name="quote_footer">Рассчитано в «Калькуляторе доставки»</string>
     <string name="transport_category">Категория транспорта</string>
     <string name="my_vehicles">Мои автомобили</string>
     <string name="save_current_vehicle">Сохранить текущее авто</string>

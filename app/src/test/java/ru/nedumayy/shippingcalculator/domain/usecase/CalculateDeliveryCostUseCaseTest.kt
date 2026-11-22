@@ -49,4 +49,37 @@ class CalculateDeliveryCostUseCaseTest {
         assertEquals(200.0, breakdown.maintenanceTotal, 0.01)
         assertEquals(100.0, breakdown.extraTotal, 0.01)
     }
+
+    @Test
+    fun calculateCost_unfilledOptionalFields_returnsZeroCostForUnfilled() {
+        val category = VehicleCategory(
+            id = "car",
+            label = UiText.DynamicString("Car"),
+            fuelConsumption = 10.0,
+            vehiclePrice = 0.0,
+            residualValue = 0.0,
+            resourceMileage = 0.0,
+            annualTax = 0.0,
+            annualInsurance = 0.0,
+            annualMileage = 0.0,
+            maintenancePerKm = 0.0,
+            hasFuel = true
+        )
+
+        val breakdown = useCase(
+            category = category,
+            distance = 100.0,
+            fuelPrice = 60.0,
+            extraExpenses = 0.0,
+            marginPercent = 0.0
+        )
+
+        assertNotNull(breakdown)
+        assertEquals(600.0, breakdown.fuelTotal, 0.01) // (10/100) * 60 * 100
+        assertEquals(0.0, breakdown.depreciationTotal, 0.01)
+        assertEquals(0.0, breakdown.taxTotal, 0.01)
+        assertEquals(0.0, breakdown.insuranceTotal, 0.01)
+        assertEquals(0.0, breakdown.maintenanceTotal, 0.01)
+        assertEquals(600.0, breakdown.finalTotal, 0.01)
+    }
 }

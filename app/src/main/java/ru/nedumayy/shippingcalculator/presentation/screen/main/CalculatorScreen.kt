@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
+import ru.nedumayy.shippingcalculator.common.ShareQuoteUtils
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.FuelType
@@ -661,6 +663,48 @@ private fun ResultCard(
                     Text(stringResource(R.string.total), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(stringResource(R.string.money_amount, formatMoney(breakdown.finalTotal)), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
                 }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            val context = LocalContext.current
+            val categoryName = state.selectedUserVehicle?.name 
+                ?: state.selectedCategory?.label?.asString(context) 
+                ?: stringResource(R.string.not_specified)
+            val distanceVal = state.distance.replace(',', '.').toDoubleOrNull() ?: 0.0
+
+            OutlinedButton(
+                onClick = {
+                    val shareText = ShareQuoteUtils.buildQuoteText(
+                        context = context,
+                        routeFrom = state.routeFrom,
+                        routeTo = state.routeTo,
+                        deliveryDate = state.deliveryDate,
+                        vehicleName = categoryName,
+                        distance = distanceVal,
+                        totalCost = breakdown.finalTotal,
+                        costPerKm = breakdown.finalPerKm
+                    )
+                    ShareQuoteUtils.shareText(
+                        context = context,
+                        title = context.getString(R.string.share_quote_title),
+                        text = shareText
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.share_quote),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

@@ -2,8 +2,8 @@
 
 ## Current status
 
-- **Harness status:** Feature F007 Execution Complete.
-- **Current task:** F007 Calculation Modes Implementation (Simple & Advanced).
+- **Harness status:** Simple Calculation Mode Logic Refactored.
+- **Current task:** Simple Calculation Mode Logic Simplification.
 - **Next action:** Done. All tasks in plan completed and verified.
 - **Known blockers:** None.
 
@@ -40,9 +40,32 @@
 | Check | Command | Result |
 | :--- | :--- | :--- |
 | Build | `:app:assembleDebug` | PASSED |
-| Unit tests | `:app:testDebugUnitTest` | PASSED (2 passed) |
+| Unit tests | `:app:testDebugUnitTest` | PASSED (4 passed) |
 
 ## Work log
+
+### 2026-07-20 — Simple Mode Logic Refactoring
+- **Goal:** Make Simple calculation mode calculate purely based on user inputs without hidden background presets.
+- **Result:**
+  - Updated `CalculateDeliveryCostUseCase.kt` to handle `0.0` values safely without throwing requirement exceptions.
+  - Updated `CalculatorViewModel.kt` so unentered fields in Simple Mode evaluate to `0.0` (excluded from calculation) instead of substituting category presets.
+  - Added unit test `calculateCost_unfilledOptionalFields_returnsZeroCostForUnfilled` in `CalculateDeliveryCostUseCaseTest.kt`.
+- **Files changed:**
+  - `domain/usecase/CalculateDeliveryCostUseCase.kt`
+  - `presentation/screen/main/CalculatorViewModel.kt`
+  - `test/java/ru/nedumayy/shippingcalculator/domain/usecase/CalculateDeliveryCostUseCaseTest.kt`
+- **Checks run:**
+  - `:app:testDebugUnitTest` (4 tests passed)
+  - `:app:assembleDebug` (build successful)
+
+### 2026-07-20 — Feature F008 Implementation: Share Delivery Quote
+- **Goal:** Implement delivery quote sharing functionality for Telegram, WhatsApp, SMS, and other apps.
+- **Result:**
+  - Created `ShareQuoteUtils` utility object with quote formatting and Android Share Intent trigger.
+  - Added string resources for quote headers, route, distance, total, and watermark in English and Russian.
+  - Added "Поделиться сметой" button to `ResultCard` in `CalculatorScreen.kt`.
+  - Added Share icon action to `HistoryItem` in `HistoryScreen.kt`.
+  - Created unit tests in `ShareQuoteUtilsTest.kt`.
 
 ### 2026-07-20 — Feature F007 Implementation: Calculation Modes
 - **Goal:** Implement Simple vs. Advanced calculation modes in Shipping Calculator app.
@@ -50,20 +73,4 @@
   - Added `CalculationMode` enum (`SIMPLE`, `ADVANCED`).
   - Added `calculationMode` property to `CalculatorUiState`.
   - Added `CalculationModeChanged` event to `CalculatorEvent`.
-  - Updated `CalculatorViewModel.kt` to fallback to default vehicle parameters in `SIMPLE` mode when inputs are blank.
   - Added mode toggle chips and conditional card visibility in `CalculatorScreen.kt`.
-  - Added localized strings in `values/strings.xml` and `values-ru/strings.xml`.
-  - Created unit tests in `CalculateDeliveryCostUseCaseTest.kt`.
-- **Files changed:**
-  - `domain/model/CalculationMode.kt` [NEW]
-  - `domain/model/ui/CalculatorUiState.kt`
-  - `common/CalculatorEvent.kt`
-  - `presentation/screen/main/CalculatorViewModel.kt`
-  - `presentation/screen/main/CalculatorScreen.kt`
-  - `values/strings.xml`
-  - `values-ru/strings.xml`
-  - `test/java/ru/nedumayy/shippingcalculator/domain/usecase/CalculateDeliveryCostUseCaseTest.kt` [NEW]
-  - `feature_list.json`
-- **Checks run:**
-  - `:app:testDebugUnitTest` (2 tests passed)
-  - `:app:assembleDebug` (build successful)

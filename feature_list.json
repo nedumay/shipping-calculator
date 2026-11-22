@@ -130,6 +130,25 @@
       "verification": ["End-to-end testing of both modes."],
       "dependencies": ["F001", "F002", "F003", "F004", "F005", "F006"],
       "notes": "This is the orchestrating task for the entire feature set."
+    },
+    {
+      "id": "F008",
+      "title": "Share Delivery Quote / Commercial Offer (PDF & Text)",
+      "description": "Export and share formatted delivery cost receipts, commercial offers, or PDF/image summaries directly to messaging apps (Telegram, WhatsApp, etc.).",
+      "status": "done",
+      "priority": "high",
+      "acceptance_criteria": [
+        "A 'Share Quote / Поделиться сметой' action is accessible from calculation result view and history items.",
+        "Generates formatted text message with route details, distance, total cost, and delivery date.",
+        "Allows exporting/sharing receipt image or PDF with custom branding/watermark.",
+        "Launches Android System Share Sheet with Telegram, WhatsApp, and other installed messaging options."
+      ],
+      "verification": [
+        "Unit tests for quote text and document formatting logic",
+        "UI verification of Share intent triggering"
+      ],
+      "dependencies": ["F002", "F004"],
+      "notes": "Enhances driver-client communication and drives viral app discovery."
     }
   ]
 }
