@@ -9,10 +9,12 @@
 
 package ru.nedumayy.shippingcalculator.common
 
+import ru.nedumayy.shippingcalculator.domain.model.CalculationMode
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
 
 sealed class CalculatorEvent {
+    data class CalculationModeChanged(val mode: CalculationMode) : CalculatorEvent()
     data class CategorySelected(val category: VehicleCategory) : CalculatorEvent()
     data class RouteFromChanged(val value: String) : CalculatorEvent()
     data class RouteToChanged(val value: String) : CalculatorEvent()

@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,11 +41,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.nedumayy.shippingcalculator.R
 import ru.nedumayy.shippingcalculator.common.CalculatorEvent
+import ru.nedumayy.shippingcalculator.common.ShareQuoteUtils
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.common.formatMoney
 import ru.nedumayy.shippingcalculator.common.FuelType
 import ru.nedumayy.shippingcalculator.common.parseDate
 import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
+import ru.nedumayy.shippingcalculator.domain.model.CalculationMode
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
 import ru.nedumayy.shippingcalculator.presentation.screen.Screen
 import java.time.Instant
@@ -105,6 +108,57 @@ fun CalculatorScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val isSimple = state.calculationMode == CalculationMode.SIMPLE
+                FilterChip(
+                    selected = isSimple,
+                    onClick = { viewModel.onEvent(CalculatorEvent.CalculationModeChanged(CalculationMode.SIMPLE)) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.mode_simple),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            fontWeight = if (isSimple) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f)
+                )
+
+                val isAdvanced = state.calculationMode == CalculationMode.ADVANCED
+                FilterChip(
+                    selected = isAdvanced,
+                    onClick = { viewModel.onEvent(CalculatorEvent.CalculationModeChanged(CalculationMode.ADVANCED)) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.mode_advanced),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            fontWeight = if (isAdvanced) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
             SectionLabel(stringResource(R.string.transport_category))
             Row(
                 modifier = Modifier
@@ -310,70 +364,74 @@ fun CalculatorScreen(
                 }
             }
 
-            InputGroupCard(title = stringResource(R.string.depreciation)) {
-                Text(
-                    stringResource(R.string.vehicle_values_are_estimates),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    NumberField(
-                        label = stringResource(R.string.vehicle_price),
-                        value = state.vehiclePrice,
-                        placeholder = state.selectedCategory?.vehiclePrice?.toLong()?.toString() ?: stringResource(R.string.zero),
-                        suffix = stringResource(R.string.ruble_sign),
-                        modifier = Modifier.weight(1f)
-                    ) { viewModel.onEvent(CalculatorEvent.VehiclePriceChanged(it)) }
-                    NumberField(
-                        label = stringResource(R.string.resource_mileage),
-                        value = state.resourceMileage,
-                        placeholder = state.selectedCategory?.resourceMileage?.toLong()?.toString() ?: stringResource(R.string.zero),
-                        suffix = stringResource(R.string.km),
-                        modifier = Modifier.weight(1f)
-                    ) { viewModel.onEvent(CalculatorEvent.ResourceMileageChanged(it)) }
-                }
-                NumberField(
-                    label = stringResource(R.string.residual_value),
-                    value = state.residualValue,
-                    placeholder = stringResource(R.string.zero),
-                    suffix = stringResource(R.string.ruble_sign),
-                    modifier = Modifier.fillMaxWidth()
-                ) { viewModel.onEvent(CalculatorEvent.ResidualValueChanged(it)) }
-            }
+            AnimatedVisibility(visible = state.calculationMode == CalculationMode.ADVANCED) {
+                Column {
+                    InputGroupCard(title = stringResource(R.string.depreciation)) {
+                        Text(
+                            stringResource(R.string.vehicle_values_are_estimates),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            NumberField(
+                                label = stringResource(R.string.vehicle_price),
+                                value = state.vehiclePrice,
+                                placeholder = state.selectedCategory?.vehiclePrice?.toLong()?.toString() ?: stringResource(R.string.zero),
+                                suffix = stringResource(R.string.ruble_sign),
+                                modifier = Modifier.weight(1f)
+                            ) { viewModel.onEvent(CalculatorEvent.VehiclePriceChanged(it)) }
+                            NumberField(
+                                label = stringResource(R.string.resource_mileage),
+                                value = state.resourceMileage,
+                                placeholder = state.selectedCategory?.resourceMileage?.toLong()?.toString() ?: stringResource(R.string.zero),
+                                suffix = stringResource(R.string.km),
+                                modifier = Modifier.weight(1f)
+                            ) { viewModel.onEvent(CalculatorEvent.ResourceMileageChanged(it)) }
+                        }
+                        NumberField(
+                            label = stringResource(R.string.residual_value),
+                            value = state.residualValue,
+                            placeholder = stringResource(R.string.zero),
+                            suffix = stringResource(R.string.ruble_sign),
+                            modifier = Modifier.fillMaxWidth()
+                        ) { viewModel.onEvent(CalculatorEvent.ResidualValueChanged(it)) }
+                    }
 
-            InputGroupCard(title = stringResource(R.string.maintenance_and_insurance)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    NumberField(
-                        label = stringResource(R.string.annual_tax),
-                        value = state.annualTax,
-                        placeholder = state.selectedCategory?.annualTax?.toLong()?.toString() ?: stringResource(R.string.zero),
-                        suffix = stringResource(R.string.rubles_per_year_short),
-                        modifier = Modifier.weight(1f)
-                    ) { viewModel.onEvent(CalculatorEvent.AnnualTaxChanged(it)) }
-                    NumberField(
-                        label = stringResource(R.string.annual_mileage),
-                        value = state.annualMileage,
-                        placeholder = state.selectedCategory?.annualMileage?.toLong()?.toString() ?: stringResource(R.string.example_annual_mileage),
-                        suffix = stringResource(R.string.km_per_year_short),
-                        modifier = Modifier.weight(1f)
-                    ) { viewModel.onEvent(CalculatorEvent.AnnualMileageChanged(it)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    NumberField(
-                        label = stringResource(R.string.maintenance_per_km),
-                        value = state.maintenancePerKm,
-                        placeholder = state.selectedCategory?.maintenancePerKm?.toString() ?: stringResource(R.string.zero),
-                        suffix = stringResource(R.string.rubles_per_km_short),
-                        modifier = Modifier.weight(1f)
-                    ) { viewModel.onEvent(CalculatorEvent.MaintenancePerKmChanged(it)) }
-                    NumberField(
-                        label = stringResource(R.string.annual_insurance),
-                        value = state.annualInsurance,
-                        placeholder = state.selectedCategory?.annualInsurance?.toLong()?.toString() ?: stringResource(R.string.zero),
-                        suffix = stringResource(R.string.rubles_per_year_short),
-                        modifier = Modifier.weight(1f)
-                    ) { viewModel.onEvent(CalculatorEvent.AnnualInsuranceChanged(it)) }
+                    InputGroupCard(title = stringResource(R.string.maintenance_and_insurance)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            NumberField(
+                                label = stringResource(R.string.annual_tax),
+                                value = state.annualTax,
+                                placeholder = state.selectedCategory?.annualTax?.toLong()?.toString() ?: stringResource(R.string.zero),
+                                suffix = stringResource(R.string.rubles_per_year_short),
+                                modifier = Modifier.weight(1f)
+                            ) { viewModel.onEvent(CalculatorEvent.AnnualTaxChanged(it)) }
+                            NumberField(
+                                label = stringResource(R.string.annual_mileage),
+                                value = state.annualMileage,
+                                placeholder = state.selectedCategory?.annualMileage?.toLong()?.toString() ?: stringResource(R.string.example_annual_mileage),
+                                suffix = stringResource(R.string.km_per_year_short),
+                                modifier = Modifier.weight(1f)
+                            ) { viewModel.onEvent(CalculatorEvent.AnnualMileageChanged(it)) }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            NumberField(
+                                label = stringResource(R.string.maintenance_per_km),
+                                value = state.maintenancePerKm,
+                                placeholder = state.selectedCategory?.maintenancePerKm?.toString() ?: stringResource(R.string.zero),
+                                suffix = stringResource(R.string.rubles_per_km_short),
+                                modifier = Modifier.weight(1f)
+                            ) { viewModel.onEvent(CalculatorEvent.MaintenancePerKmChanged(it)) }
+                            NumberField(
+                                label = stringResource(R.string.annual_insurance),
+                                value = state.annualInsurance,
+                                placeholder = state.selectedCategory?.annualInsurance?.toLong()?.toString() ?: stringResource(R.string.zero),
+                                suffix = stringResource(R.string.rubles_per_year_short),
+                                modifier = Modifier.weight(1f)
+                            ) { viewModel.onEvent(CalculatorEvent.AnnualInsuranceChanged(it)) }
+                        }
+                    }
                 }
             }
 
@@ -605,6 +663,48 @@ private fun ResultCard(
                     Text(stringResource(R.string.total), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(stringResource(R.string.money_amount, formatMoney(breakdown.finalTotal)), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
                 }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            val context = LocalContext.current
+            val categoryName = state.selectedUserVehicle?.name 
+                ?: state.selectedCategory?.label?.asString(context) 
+                ?: stringResource(R.string.not_specified)
+            val distanceVal = state.distance.replace(',', '.').toDoubleOrNull() ?: 0.0
+
+            OutlinedButton(
+                onClick = {
+                    val shareText = ShareQuoteUtils.buildQuoteText(
+                        context = context,
+                        routeFrom = state.routeFrom,
+                        routeTo = state.routeTo,
+                        deliveryDate = state.deliveryDate,
+                        vehicleName = categoryName,
+                        distance = distanceVal,
+                        totalCost = breakdown.finalTotal,
+                        costPerKm = breakdown.finalPerKm
+                    )
+                    ShareQuoteUtils.shareText(
+                        context = context,
+                        title = context.getString(R.string.share_quote_title),
+                        text = shareText
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.share_quote),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

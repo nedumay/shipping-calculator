@@ -17,6 +17,19 @@
     <string name="fill_required_fields">Fill in the required fields</string>
 
     <string name="cost_calculation">Cost calculation</string>
+    <string name="calculation_mode">Calculation mode</string>
+    <string name="mode_simple">Simple</string>
+    <string name="mode_advanced">Advanced</string>
+    <string name="share_quote">Share quote</string>
+    <string name="share_quote_title">Delivery quote</string>
+    <string name="quote_header">🚚 Delivery Cost Quote</string>
+    <string name="quote_route">📍 Route: %1$s → %2$s</string>
+    <string name="quote_distance">📏 Distance: %1$s km</string>
+    <string name="quote_date">📅 Delivery date: %1$s</string>
+    <string name="quote_vehicle">🚗 Vehicle: %1$s</string>
+    <string name="quote_total">💰 Total cost: %1$s ₽</string>
+    <string name="quote_rate">(Rate: %1$s ₽/km)</string>
+    <string name="quote_footer">Calculated in Shipping Calculator</string>
     <string name="transport_category">Transport category</string>
     <string name="my_vehicles">My vehicles</string>
     <string name="save_current_vehicle">Save current vehicle</string>
