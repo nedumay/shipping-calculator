@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "Shipping calculator",
+    "platform": "Android",
+    "primary_language": "Kotlin",
+    "notes": "Project discovered and analyzed. Features categorized based on existing codebase."
+  },
+  "status_values": [
+    "pending",
+    "in_progress",
+    "blocked",
+    "done"
+  ],
+  "features": [
+    {
+      "id": "F001",
+      "title": "Vehicle Management",
+      "description": "CRUD operations for user vehicles, including setting types, categories, and managing lists.",
+      "status": "done",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Vehicles can be added, updated, and deleted.",
+        "Vehicles are categorized (e.g., Moped, Shuttle).",
+        "User vehicles are persistent via Room database."
+      ],
+      "verification": [
+        "Unit tests for `UpdateUserVehicleUseCase`",
+        "UI inspection of `VehiclesScreen`"
+      ],
+      "dependencies": [],
+      "notes": "Core data model and repository are fully implemented."
+    },
+    {
+      "id": "F002",
+      "title": "Delivery Cost Calculation",
+      "description": "Core feature to calculate estimated delivery costs based on vehicle type, distance, and fuel consumption.",
+      "status": "done",
+      "priority": "critical",
+      "acceptance_criteria": [
+        "Calculation logic is implemented and uses appropriate models (`DeliveryCalculation`, `CostBreakdown`).",
+        "The main screen (`CalculatorScreen`) successfully displays results."
+      ],
+      "verification": [
+        "Unit tests for `CalculateDeliveryCostUseCase`",
+        "Manual verification against expected mathematical outputs"
+      ],
+      "dependencies": ["F001"],
+      "notes": "This is the primary business logic of the application."
+    },
+    {
+      "id": "F003",
+      "title": "Maintenance Logging",
+      "description": "Allow users to log maintenance records for their vehicles (e.g., oil changes, tire rotations).",
+      "status": "done",
+      "priority": "medium",
+      "acceptance_criteria": [
+        "Maintenance records can be added and retrieved via `MaintenanceRepository`.",
+        "Maintenance history is displayed in a dedicated screen/list.",
+        "Data is persisted correctly using Room."
+      ],
+      "verification": [
+        "Unit tests for maintenance Use Cases",
+        "UI verification of history screens"
+      ],
+      "dependencies": ["F001"],
+      "notes": "Crucial for vehicle maintenance tracking."
+    },
+    {
+      "id": "F004",
+      "title": "Calculation History",
+      "description": "Save and retrieve historical delivery calculation results for later review.",
+      "status": "done",
+      "priority": "medium",
+      "acceptance_criteria": [
+        "The application maintains a history of past calculations.",
+        "History data is retrieved and displayed in a dedicated UI screen."
+      ],
+      "verification": [
+        "Verification of `SaveCalculationHistoryUseCase` successful execution",
+        "UI verification of history list"
+      ],
+      "dependencies": ["F002"],
+      "notes": "Implements long-term data tracking for user use."
+    },
+    {
+      "id": "F005",
+      "title": "User Settings Management",
+      "description": "Manage application-wide settings such as preferred fuel types or calculation preferences.",
+      "status": "done",
+      "priority": "low",
+      "acceptance_criteria": [
+        "Settings can be read and written persistently (`SettingsEntity`).",
+        "Settings affect calculation logic."
+      ],
+      "verification": [
+        "Manual check of persisted settings",
+        "Testing settings impact on cost calculation"
+      ],
+      "dependencies": [],
+      "notes": "Uses a dedicated Room entity and repository for settings."
+    },
+    {
+      "id": "F006",
+      "title": "Usage Analytics",
+      "description": "Track and display statistics related to application usage and calculated data.",
+      "status": "done",
+      "priority": "low",
+      "acceptance_criteria": [
+        "Usage statistics can be collected.",
+        "The `AnalyticsScreen` successfully fetches and displays data."
+      ],
+      "verification": [
+        "Verification of `GetAnalyticsUseCase` results",
+        "Visual inspection of `AnalyticsScreen`"
+      ],
+      "dependencies": [],
+      "notes": "Data is modeled as `AnalyticsData`."
+    }
+  ]
+}
