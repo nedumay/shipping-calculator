@@ -2,10 +2,10 @@
 
 ## Current status
 
-- **Harness status:** Initializing/Executing repository discovery.
-- **Current task:** Complete repository structure and configuration analysis (Phase 1).
-- **Next action:** Await user confirmation before starting implementation of new features.
-- **Known blockers:** None recorded.
+- **Harness status:** Feature F007 Execution Complete.
+- **Current task:** F007 Calculation Modes Implementation (Simple & Advanced).
+- **Next action:** Done. All tasks in plan completed and verified.
+- **Known blockers:** None.
 
 ## Project overview
 
@@ -31,44 +31,39 @@
 
 ### Architecture Details
 - **State Management:** MVVM pattern (ViewModels managing UiState).
-- **Dependency Injection:** Present (Inferred Hilt usage via `di/` modules).
+- **Dependency Injection:** Hilt
 - **Persistence:** Room (via `AppDatabase.kt` and corresponding Entities/DAOs).
-- **Networking:** Not detected in current analysis.
-- **Asynchronous work:** Coroutines (Standard for modern Kotlin Android development).
+- **Asynchronous work:** Coroutines
 
-## Baseline
+## Baseline & Verification Results
 
 | Check | Command | Result |
 | :--- | :--- | :--- |
-| Build | Not run | Pending discovery |
-| Unit tests | Not run | Pending discovery |
-| Lint / static analysis | Not run | Pending discovery |
-
-## Issues and Risks
-
-> [!WARNING]
-> **Missing Networking Implementation:** The current project structure does not reveal any networking dependencies or services (e.g., Retrofit). Any feature requiring external APIs will necessitate the introduction of new dependencies and configuration.
->
-> [!IMPORTANT]
-> **Architectural Consistency:** The project follows established Clean Architecture principles. I will strictly preserve this structure and only make changes directly related to the requested feature scope.
-
-## Active work
-
-No product feature is active yet.
-
-## Decisions and constraints
-
-- Preserve the existing architecture unless a change is explicitly requested by the user.
-- Preserve the configured `minSdk` unless the user approves changing it.
-- Prefer small, verifiable changes.
-- Do not claim a check passed unless it completed successfully.
+| Build | `:app:assembleDebug` | PASSED |
+| Unit tests | `:app:testDebugUnitTest` | PASSED (2 passed) |
 
 ## Work log
 
-### 2026-07-20 — Repository Discovery Completion
-- **Goal:** Analyze and document the project structure, technologies, and configurations.
-- **Result:** Project structure and tech stack documented in this file. Initial assessment confirms a Clean Architecture based on MVVM/Compose, utilizing Room and modern Kotlin features.
-- **Files/modules changed:** `claude-progress.md`
-- **Checks run:** None (Initial discovery).
-- **Known issues/blockers:** None.
-- **Next action:** Await user instruction for the first feature implementation.
+### 2026-07-20 — Feature F007 Implementation: Calculation Modes
+- **Goal:** Implement Simple vs. Advanced calculation modes in Shipping Calculator app.
+- **Result:**
+  - Added `CalculationMode` enum (`SIMPLE`, `ADVANCED`).
+  - Added `calculationMode` property to `CalculatorUiState`.
+  - Added `CalculationModeChanged` event to `CalculatorEvent`.
+  - Updated `CalculatorViewModel.kt` to fallback to default vehicle parameters in `SIMPLE` mode when inputs are blank.
+  - Added mode toggle chips and conditional card visibility in `CalculatorScreen.kt`.
+  - Added localized strings in `values/strings.xml` and `values-ru/strings.xml`.
+  - Created unit tests in `CalculateDeliveryCostUseCaseTest.kt`.
+- **Files changed:**
+  - `domain/model/CalculationMode.kt` [NEW]
+  - `domain/model/ui/CalculatorUiState.kt`
+  - `common/CalculatorEvent.kt`
+  - `presentation/screen/main/CalculatorViewModel.kt`
+  - `presentation/screen/main/CalculatorScreen.kt`
+  - `values/strings.xml`
+  - `values-ru/strings.xml`
+  - `test/java/ru/nedumayy/shippingcalculator/domain/usecase/CalculateDeliveryCostUseCaseTest.kt` [NEW]
+  - `feature_list.json`
+- **Checks run:**
+  - `:app:testDebugUnitTest` (2 tests passed)
+  - `:app:assembleDebug` (build successful)

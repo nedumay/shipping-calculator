@@ -9,12 +9,14 @@
 
 package ru.nedumayy.shippingcalculator.domain.model.ui
 
+import ru.nedumayy.shippingcalculator.domain.model.CalculationMode
 import ru.nedumayy.shippingcalculator.domain.model.CostBreakdown
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
 import java.time.LocalDate
 
 data class CalculatorUiState(
+    val calculationMode: CalculationMode = CalculationMode.SIMPLE,
     val categories: List<VehicleCategory> = emptyList(),
     val selectedCategory: VehicleCategory? = null,
     val userVehicles: List<UserVehicle> = emptyList(),

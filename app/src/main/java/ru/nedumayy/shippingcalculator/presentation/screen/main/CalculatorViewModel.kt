@@ -29,6 +29,7 @@ import ru.nedumayy.shippingcalculator.common.UiText
 import ru.nedumayy.shippingcalculator.common.formatDate
 import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiEffect
 import ru.nedumayy.shippingcalculator.domain.model.ui.CalculatorUiState
+import ru.nedumayy.shippingcalculator.domain.model.CalculationMode
 import ru.nedumayy.shippingcalculator.domain.model.DeliveryCalculation
 import ru.nedumayy.shippingcalculator.domain.model.UserVehicle
 import ru.nedumayy.shippingcalculator.domain.model.VehicleCategory
@@ -91,6 +92,10 @@ class CalculatorViewModel @Inject constructor(
 
     private suspend fun handleEvent(event: CalculatorEvent) {
         when (event) {
+            is CalculatorEvent.CalculationModeChanged -> {
+                _state.update { it.copy(calculationMode = event.mode) }
+                calculateCost()
+            }
             is CalculatorEvent.CategorySelected -> {
                 _state.update { 
                     it.copy(
@@ -272,19 +277,32 @@ class CalculatorViewModel @Inject constructor(
                 _state.update { it.copy(costBreakdown = null, calculationError = UiText.StringResource(R.string.select_transport)) }
                 return
             }
-        val hasFuel = currentState.selectedUserVehicle?.hasFuel ?: baseCategory.hasFuel
+        val userVehicle = currentState.selectedUserVehicle
+        val hasFuel = userVehicle?.hasFuel ?: baseCategory.hasFuel
+        val isSimpleMode = currentState.calculationMode == CalculationMode.SIMPLE
+
         val fuelConsumption = parseFiniteDouble(currentState.fuelConsumption)
+            ?: if (isSimpleMode) (userVehicle?.fuelConsumption ?: baseCategory.fuelConsumption) else null
         val vehiclePrice = parseFiniteDouble(currentState.vehiclePrice)
+            ?: if (isSimpleMode) (userVehicle?.vehiclePrice ?: baseCategory.vehiclePrice) else null
         val residualValue = parseFiniteDouble(currentState.residualValue)
+            ?: if (isSimpleMode) (userVehicle?.residualValue ?: baseCategory.residualValue) else null
         val resourceMileage = parseFiniteDouble(currentState.resourceMileage)
+            ?: if (isSimpleMode) (userVehicle?.resourceMileage ?: baseCategory.resourceMileage) else null
         val annualTax = parseFiniteDouble(currentState.annualTax)
+            ?: if (isSimpleMode) (userVehicle?.annualTax ?: baseCategory.annualTax) else null
         val annualInsurance = parseFiniteDouble(currentState.annualInsurance)
+            ?: if (isSimpleMode) (userVehicle?.annualInsurance ?: baseCategory.annualInsurance) else null
         val annualMileage = parseFiniteDouble(currentState.annualMileage)
+            ?: if (isSimpleMode) (userVehicle?.annualMileage ?: baseCategory.annualMileage) else null
         val maintenancePerKm = parseFiniteDouble(currentState.maintenancePerKm)
+            ?: if (isSimpleMode) (userVehicle?.maintenancePerKm ?: baseCategory.maintenancePerKm) else null
+
         val distance = parseFiniteDouble(currentState.distance)
         val fuelPrice = parseFiniteDouble(currentState.fuelPrice)
-        val extraExpenses = parseFiniteDouble(currentState.extraExpenses)
-        val marginPercent = parseFiniteDouble(currentState.marginPercent)
+            ?: if (isSimpleMode) (userVehicle?.fuelPrice ?: 0.0) else null
+        val extraExpenses = parseFiniteDouble(currentState.extraExpenses) ?: 0.0
+        val marginPercent = parseFiniteDouble(currentState.marginPercent) ?: 0.0
 
         val numbers = listOf(
             fuelConsumption, vehiclePrice, residualValue, resourceMileage, annualTax,
@@ -324,8 +342,8 @@ class CalculatorViewModel @Inject constructor(
             category = virtualCategory,
             distance = distance!!,
             fuelPrice = if (hasFuel) fuelPrice!! else 0.0,
-            extraExpenses = extraExpenses!!,
-            marginPercent = marginPercent!!
+            extraExpenses = extraExpenses,
+            marginPercent = marginPercent
         )
 
         _state.update { it.copy(costBreakdown = breakdown, calculationError = null) }
@@ -337,8 +355,8 @@ class CalculatorViewModel @Inject constructor(
         val breakdown = currentState.costBreakdown ?: return
 
         val distance = parseFiniteDouble(currentState.distance)
-        val marginPercent = parseFiniteDouble(currentState.marginPercent)
-        if (currentState.routeTo.isBlank() || distance == null || marginPercent == null) {
+        val marginPercent = parseFiniteDouble(currentState.marginPercent) ?: 0.0
+        if (currentState.routeTo.isBlank() || distance == null) {
             _effects.emit(CalculatorUiEffect(showMessage = UiText.StringResource(R.string.fill_required_fields)))
             return
         }

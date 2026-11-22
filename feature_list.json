@@ -116,6 +116,20 @@
       ],
       "dependencies": [],
       "notes": "Data is modeled as `AnalyticsData`."
+    },
+    {
+      "id": "F007",
+      "title": "Calculation Modes Implementation (NEW)",
+      "description": "Introduce a toggle between 'Simple' and 'Advanced' modes to control UI and calculation complexity.",
+      "status": "done",
+      "priority": "critical",
+      "acceptance_criteria": [
+        "A toggle UI is implemented in `CalculatorScreen`. ",
+        "State management switches all related use cases (F001-F006) between their Simple and Advanced implementations based on the toggle state."
+      ],
+      "verification": ["End-to-end testing of both modes."],
+      "dependencies": ["F001", "F002", "F003", "F004", "F005", "F006"],
+      "notes": "This is the orchestrating task for the entire feature set."
     }
   ]
 }
